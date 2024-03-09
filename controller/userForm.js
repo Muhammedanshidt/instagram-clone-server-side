@@ -1,125 +1,62 @@
-// const { config } = require("dotenv");
-// const userModel = require("../SchemaModel.js/userModel");
-// const nodemailer = require("nodemailer")
-// const configJs = require("../config/config")
-
-//  const transporter = nodemailer.createTransport({
-
-//   service:"gmail",
-//   auth:{
-//     user:configJs.email, // generated ethereal
-//     pass:configJs.password// generated eth
-
-//   }
-
-//  })
-
-//  const generatedOtp = () => {
-//   return Math.floor(100000 + Math.random() * 900000)
-// }
-
-// const userSignUp = async (req, res) => {
-//   try {
-//       console.log(req.body)
-
-//       const {email} = req.body
-
-//       const findEmail = await userModel.findOne({email:email});
-
-//       if (findEmail) {
-//           res.status(400).send("User already exists");
-//           return;
-//       }
-
-//       const verificationCode = generatedOtp();
-//       const mailOptions = {
-//               from:configJs.user,
-//               to:email,
-//               subject:"otp",
-//               text:verificationCode
-//       };
-
-//       transporter.sendMail(mailOptions, (error) => {
-//         if (error) {
-//           console.error(error);
-//           return res.status(500).send('Failed to send verification code');
-//         }
-//       });
-
-//       const newUser = await userModel.create(req.body);
-//       if(newUser){
-//         res.status(200).json({
-//           message: "Successful registration",
-//           success: true
-//       });
-//       }
-
-//   } catch (error) {
-//       console.log("Error creating user:", error);
-//       return res.status(500).json({
-//           alert: error.message,
-//           message: "Internal server error. Please try again later",
-//       });
-//   }
-// };
-  
-//   module.exports ={
-//     userSignUp
-//   }
 
 const { config } = require("dotenv");
 const userModel = require("../SchemaModel.js/userModel");
 const nodemailer = require("nodemailer")
 const configJs = require("../config/config")
+const jwt = require("jsonwebtoken");
 
-config(); // Load environment variables from .env file
+config();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user:" anshidkhanak@gmail.com",
-    pass: "ubfb bkcw awmr jqdd",
-  }
-});
 
-const generatedOtp = () => {
-  return Math.floor(100000 + Math.random() * 900000)
-}
-
+// USER SIGNUP
 const userSignUp = async (req, res) => {
   try {
-    console.log(req.body)
+    const { email } = req.body;
 
-    const { email } = req.body
 
-    const findEmail = await userModel.findOne({ email: email });
 
-    if (findEmail) {
+    // Check if email already exists
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
       return res.status(400).send("User already exists");
     }
 
-    const verificationCode = generatedOtp();
+    console.log(email);
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: configJs.config.user,
+        pass: "ubfb bkcw awmr jqdd", // Consider using environment variables
+      },
+    });
+
+    // Generate OTP
+    const generatedOtp = () => Math.floor(100000 + Math.random() * 900000);
+    const otp = generatedOtp();
+
+    // Sign OTP with JWT
+    const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET || "defaultSecret");
+
+    // Set cookie with JWT
+    res.cookie("otpToken", jwtOtp);
+
+    // Send OTP via email
     const mailOptions = {
       from: configJs.config.user,
       to: email,
-      subject: "otp",
-      text: verificationCode.toString() // Convert to string
+      subject: "OTP",
+      text: `Your OTP is: ${otp}`,
     };
-
     transporter.sendMail(mailOptions, (error) => {
       if (error) {
         console.error(error);
-        return res.status(500).send('Failed to send verification code');
+        return res.status(500).send("Failed to send verification code");
       }
     });
 
-    const newUser = await userModel.create(req.body);
-    if (newUser) {
-      return res.status(200).json({
-        message: "Successful registration",
-        success: true
-      });
-    }
+    // Return success message
+    return res.status(200).json({ message: "OTP sent successfully" });
 
   } catch (error) {
     console.log("Error creating user:", error);
@@ -130,6 +67,42 @@ const userSignUp = async (req, res) => {
   }
 };
 
+
+// USER REGISTER
+
+const userRegByVerification = async (req, res) => {
+
+  const { userData, otp  } = req.body
+  console.log(userData,"userdata");
+  const token = req.cookies.otpToken;
+
+
+  if (!token) {
+    return res.status(400).json({ message: 'OTP token not found' });
+  }
+
+  let decodedToken ;
+  try {
+    decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (error) {
+    return res.status(400).json({ message: 'Invalid token' });
+  } 
+// console.log(decodedToken.otp);
+
+
+  if (decodedToken.otp === otp) {
+
+    const userCreate = await userModel.create(userData);
+    return res.status(200).json({ message: 'OTP verified', success: true });
+  } else {
+    return res.status(400).json({ message: 'OTP does not match' });
+  }
+
+}
+
+
+
 module.exports = {
-  userSignUp
+  userSignUp,
+  userRegByVerification
 }

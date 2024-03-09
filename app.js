@@ -17,10 +17,6 @@ app.use(cors({
 const routeSingUp = require("./Routes/UserRoute");
 app.use("/user",routeSingUp);
 
-// //Admin area
-// const routeAdminIn = require("./routes/AdminIn");
-// app.use("/user",routeAdminIn);
 
-// app.use(errorhandler)
 
 module.exports = app;
