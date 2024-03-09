@@ -10,24 +10,27 @@ config();
 
 // USER SIGNUP
 const userSignUp = async (req, res) => {
+  
+    
   try {
     const { email } = req.body;
 
-
+    console.log(req.body);
 
     // Check if email already exists
     const existingUser = await userModel.findOne({ email });
+    console.log(existingUser);
     if (existingUser) {
       return res.status(400).send("User already exists");
     }
-
     console.log(email);
+    
     // Create transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: configJs.config.user,
-        pass: "ubfb bkcw awmr jqdd", // Consider using environment variables
+        pass: "ubfb bkcw awmr jqdd", 
       },
     });
 
@@ -35,10 +38,10 @@ const userSignUp = async (req, res) => {
     const generatedOtp = () => Math.floor(100000 + Math.random() * 900000);
     const otp = generatedOtp();
 
-    // Sign OTP with JWT
-    const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET || "defaultSecret");
+    
+    const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET );
 
-    // Set cookie with JWT
+    
     res.cookie("otpToken", jwtOtp);
 
     // Send OTP via email
@@ -52,11 +55,10 @@ const userSignUp = async (req, res) => {
       if (error) {
         console.error(error);
         return res.status(500).send("Failed to send verification code");
+      }else{
+        return res.status(200).json({message:"Verification Code Sent"});
       }
     });
-
-    // Return success message
-    return res.status(200).json({ message: "OTP sent successfully" });
 
   } catch (error) {
     console.log("Error creating user:", error);
@@ -75,34 +77,44 @@ const userRegByVerification = async (req, res) => {
   const { userData, otp  } = req.body
   console.log(userData,"userdata");
   const token = req.cookies.otpToken;
-
+  // console.log(otp);
+  // console.log(token,'token');
 
   if (!token) {
-    return res.status(400).json({ message: 'OTP token not found' });
+    return res.status(404).json({ message: 'OTP token not found' });
   }
-
   let decodedToken ;
-  try {
+ try {
     decodedToken = jwt.verify(token, process.env.JWT_SECRET);
   } catch (error) {
     return res.status(400).json({ message: 'Invalid token' });
   } 
-// console.log(decodedToken.otp);
+//  console.log(decodedToken.otp,otp);
+// console.log(typeof(otp));
+// console.log(typeof(decodedToken.otp));
 
-
-  if (decodedToken.otp === otp) {
-
+   if (decodedToken.otp === parseInt(otp)) {
     const userCreate = await userModel.create(userData);
     return res.status(200).json({ message: 'OTP verified', success: true });
   } else {
     return res.status(400).json({ message: 'OTP does not match' });
-  }
+}
 
 }
+
+//sample for user getting
+
+const getUserData  = async (req,res)=>{
+  const user = await userModel.find()
+    res.send(user)
+}
+
+// login
 
 
 
 module.exports = {
   userSignUp,
-  userRegByVerification
+  userRegByVerification,
+  getUserData
 }
