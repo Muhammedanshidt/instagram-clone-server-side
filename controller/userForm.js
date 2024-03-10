@@ -104,17 +104,53 @@ const userRegByVerification = async (req, res) => {
 
 //sample for user getting
 
-const getUserData  = async (req,res)=>{
-  const user = await userModel.find()
-    res.send(user)
-}
+// const getUserData  = async (req,res)=>{
+//   const user = await userModel.find()
+//     res.send(user)
+// }
 
 // login
 
+const userLogin =  async (req,res)=>{
+  const { email,password} = req.body;
+  const findUser = await userModel.findOne({ email: email });
+    console.log(findUser);
+
+    if (!findUser) {
+      res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+      return;
+    }
+    // console.log(findUser.password +" hey "+ password);
+    if(password === findUser.password){
+      res.status(200).json({
+        success:true,
+        message:"Logged in successfully",
+        
+      })
+    }else{
+      res.status(401).json({
+        success:false,
+        message:"Invalid Password"
+        })
+    }
+
+    const accessToken  = await jwt.sign(
+      {email:findUser.email, id : findUser._id},process.env.JWT_SECRET,
+      {expiresIn:'1h'}
+      )
+
+      console.log(accessToken);
+      
+      
+    
+    }
 
 
 module.exports = {
   userSignUp,
   userRegByVerification,
-  getUserData
+  userLogin
 }
