@@ -1,4 +1,3 @@
-
 const { config } = require("dotenv");
 const userModel = require("../SchemaModel.js/userModel");
 const nodemailer = require("nodemailer")
@@ -10,8 +9,8 @@ config();
 
 // USER SIGNUP
 const userSignUp = async (req, res) => {
-  
-    
+
+
   try {
     const { email } = req.body;
 
@@ -24,13 +23,13 @@ const userSignUp = async (req, res) => {
       return res.status(400).send("User already exists");
     }
     console.log(email);
-    
+
     // Create transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: configJs.config.user,
-        pass: "ubfb bkcw awmr jqdd", 
+        pass: "ubfb bkcw awmr jqdd",
       },
     });
 
@@ -38,10 +37,10 @@ const userSignUp = async (req, res) => {
     const generatedOtp = () => Math.floor(100000 + Math.random() * 900000);
     const otp = generatedOtp();
 
-    
-    const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET );
 
-    
+    const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET);
+
+
     res.cookie("otpToken", jwtOtp);
 
     // Send OTP via email
@@ -55,8 +54,8 @@ const userSignUp = async (req, res) => {
       if (error) {
         console.error(error);
         return res.status(500).send("Failed to send verification code");
-      }else{
-        return res.status(200).json({message:"Verification Code Sent"});
+      } else {
+        return res.status(200).json({ message: "Verification Code Sent" });
       }
     });
 
@@ -74,8 +73,8 @@ const userSignUp = async (req, res) => {
 
 const userRegByVerification = async (req, res) => {
 
-  const { userData, otp  } = req.body
-  console.log(userData,"userdata");
+  const { userData, otp } = req.body
+  console.log(userData, "userdata");
   const token = req.cookies.otpToken;
   // console.log(otp);
   // console.log(token,'token');
@@ -83,22 +82,22 @@ const userRegByVerification = async (req, res) => {
   if (!token) {
     return res.status(404).json({ message: 'OTP token not found' });
   }
-  let decodedToken ;
- try {
+  let decodedToken;
+  try {
     decodedToken = jwt.verify(token, process.env.JWT_SECRET);
   } catch (error) {
     return res.status(400).json({ message: 'Invalid token' });
-  } 
-//  console.log(decodedToken.otp,otp);
-// console.log(typeof(otp));
-// console.log(typeof(decodedToken.otp));
+  }
+  //  console.log(decodedToken.otp,otp);
+  // console.log(typeof(otp));
+  // console.log(typeof(decodedToken.otp));
 
-   if (decodedToken.otp === parseInt(otp)) {
+  if (decodedToken.otp === parseInt(otp)) {
     const userCreate = await userModel.create(userData);
     return res.status(200).json({ message: 'OTP verified', success: true });
   } else {
     return res.status(400).json({ message: 'OTP does not match' });
-}
+  }
 
 }
 
@@ -111,42 +110,50 @@ const userRegByVerification = async (req, res) => {
 
 // login
 
-const userLogin =  async (req,res)=>{
-  const { email,password} = req.body;
+const userLogin = async (req, res) => {
+  const { email, password } = req.body;
   const findUser = await userModel.findOne({ email: email });
-    console.log(findUser);
+  console.log(findUser);
 
-    if (!findUser) {
-      res.status(401).json({
-        success: false,
-        message: "User not found",
-      });
-      return;
-    }
-    // console.log(findUser.password +" hey "+ password);
-    if(password === findUser.password){
-      res.status(200).json({
-        success:true,
-        message:"Logged in successfully",
-        
-      })
-    }else{
-      res.status(401).json({
-        success:false,
-        message:"Invalid Password"
-        })
-    }
+  if (!findUser) {
+    res.status(401).json({
+      success: false,
+      message: "User not found",
+    });
+    return;
+  }
+  // console.log(findUser.password +" hey "+ password);
+  if (password === findUser.password) {
+    res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+    })
+  } else {
+    res.status(401).json({
+      success: false,
+      message: "Invalid Password"
+    })
+  }
+  const accessToken = await jwt.sign(
+    { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET,
+    // {expiresIn:'1h'}
+  )
+  console.log(accessToken);
+  console.log("login success");
 
-    const accessToken  = await jwt.sign(
-      {email:findUser.email, id : findUser._id},process.env.JWT_SECRET,
-      {expiresIn:'1h'}
-      )
+  // res.cookie("loginToken",accessToken)
 
-      console.log(accessToken);
-      
-      
-    
-    }
+  res.status(200).json({
+    success:true,
+    message:"successful login",
+    accessToken,
+    userid:findUser.id
+  })
+
+
+
+
+}
 
 
 module.exports = {

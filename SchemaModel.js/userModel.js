@@ -30,6 +30,34 @@ const userSchema = mongoos.Schema({
         minlength: [6, "Password, at least needs 6 letters"],
 
  }
-,})
+,
+
+profileimage:{
+   type:String,
+   default:"",
+},
+
+post: [{type: mongoos.Types.ObjectId, ref:'Post'}],
+// comments: [{type: mongoos.Types.ObjectId,ref:"Comment"}],
+likes: [{type:mongoos.Types.ObjectId,ref:'Post'}],
+saved: [{type: mongoos.Types.ObjectId,ref:'Post'}],
+
+followers : [
+   {
+         type: mongoos.Schema.Types.ObjectId,
+         ref: 'User'
+   },
+] ,
+following :[{
+   type: mongoos.Schema.Types.ObjectId,
+   ref: 'User',
+}],
+
+bio:{
+   type:String,
+   default:""
+}
+
+})
 
 module.exports= mongoos.model('User',userSchema )
