@@ -110,54 +110,118 @@ const userRegByVerification = async (req, res) => {
 
 // login
 
+// const userLogin = async (req, res) => {
+//   const { email, password } = req.body;
+//   const findUser = await userModel.findOne({ email: email });
+//   console.log(findUser);
+
+//   if (!findUser) {
+//     res.status(401).json({
+//       success: false,
+//       message: "User not found",
+//     });
+//     return;
+//   }
+//   // console.log(findUser.password +" hey "+ password);
+//   if (password === findUser.password) {
+//     res.status(200).json({
+//       success: true,
+//       message: "Logged in successfully",
+//     })
+//   } else {
+//     res.status(401).json({
+//       success: false,
+//       message: "Invalid Password"
+//     })
+//   }
+//   const accessToken = jwt.sign(
+//     { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
+//   )
+//   console.log(accessToken);
+//   console.log("login success");
+
+//   res.cookie("loginToken", accessToken);
+
+//   res.status(200).json({
+//     success:true,
+//     message:"successful login",
+//     accessToken,
+//     userid:findUser.id
+//   })
+
+
+
+
+// }
+
 const userLogin = async (req, res) => {
   const { email, password } = req.body;
   const findUser = await userModel.findOne({ email: email });
-  console.log(findUser);
 
   if (!findUser) {
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
       message: "User not found",
     });
-    return;
   }
-  // console.log(findUser.password +" hey "+ password);
-  if (password === findUser.password) {
-    res.status(200).json({
-      success: true,
-      message: "Logged in successfully",
-    })
-  } else {
-    res.status(401).json({
+
+  if (password !== findUser.password) {
+    return res.status(401).json({
       success: false,
       message: "Invalid Password"
-    })
+    });
   }
-  const accessToken = await jwt.sign(
-    { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET,
-    // {expiresIn:'1h'}
-  )
-  console.log(accessToken);
-  console.log("login success");
 
-  // res.cookie("loginToken",accessToken)
+  const accessToken = jwt.sign(
+    { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
+  );
+
+  res.cookie("loginToken", accessToken, { httpOnly: true });
+
+  return res.status(200).json({
+    success: true,
+    message: "successful login",
+    accessToken,
+    userid: findUser.id
+  });
+};
+
+// user access
+
+const userAccess = async(req,res)=>{
+  const Useremail  = req.body.email;
+  console.log(Useremail)
+  try {
+
+    const existingUser = await userModel.findOne({ email:Useremail});
+  const token = req.cookies.token;
+
+  console.log(token)
+
+  if (!existingUser ) {
+    
+    return res.status(401).json({ successful: false, error: "Unauthorized" });
+  }
 
   res.status(200).json({
-    success:true,
-    message:"successful login",
-    accessToken,
-    userid:findUser.id
-  })
+    Data: existingUser,
+    successful: true
+  });
 
-
-
-
+    
+  } catch (error) {
+    res.status(500).json({
+    message:'server got an issue',
+    successful: false
+  });
+  }
+ 
 }
 
 
 module.exports = {
   userSignUp,
   userRegByVerification,
-  userLogin
+  userLogin,
+  userAccess
 }
