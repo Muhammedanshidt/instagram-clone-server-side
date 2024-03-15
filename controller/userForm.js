@@ -76,8 +76,7 @@ const userRegByVerification = async (req, res) => {
   const { userData, otp } = req.body
   console.log(userData, "userdata");
   const token = req.cookies.otpToken;
-  // console.log(otp);
-  // console.log(token,'token');
+
 
   if (!token) {
     return res.status(404).json({ message: 'OTP token not found' });
@@ -88,9 +87,7 @@ const userRegByVerification = async (req, res) => {
   } catch (error) {
     return res.status(400).json({ message: 'Invalid token' });
   }
-  //  console.log(decodedToken.otp,otp);
-  // console.log(typeof(otp));
-  // console.log(typeof(decodedToken.otp));
+ 
 
   if (decodedToken.otp === parseInt(otp)) {
     const userCreate = await userModel.create(userData);
@@ -101,58 +98,6 @@ const userRegByVerification = async (req, res) => {
 
 }
 
-//sample for user getting
-
-// const getUserData  = async (req,res)=>{
-//   const user = await userModel.find()
-//     res.send(user)
-// }
-
-// login
-
-// const userLogin = async (req, res) => {
-//   const { email, password } = req.body;
-//   const findUser = await userModel.findOne({ email: email });
-//   console.log(findUser);
-
-//   if (!findUser) {
-//     res.status(401).json({
-//       success: false,
-//       message: "User not found",
-//     });
-//     return;
-//   }
-//   // console.log(findUser.password +" hey "+ password);
-//   if (password === findUser.password) {
-//     res.status(200).json({
-//       success: true,
-//       message: "Logged in successfully",
-//     })
-//   } else {
-//     res.status(401).json({
-//       success: false,
-//       message: "Invalid Password"
-//     })
-//   }
-//   const accessToken = jwt.sign(
-//     { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
-//   )
-//   console.log(accessToken);
-//   console.log("login success");
-
-//   res.cookie("loginToken", accessToken);
-
-//   res.status(200).json({
-//     success:true,
-//     message:"successful login",
-//     accessToken,
-//     userid:findUser.id
-//   })
-
-
-
-
-// }
 
 const userLogin = async (req, res) => {
   const { email, password } = req.body;
@@ -191,10 +136,11 @@ const userLogin = async (req, res) => {
 const userAccess = async(req,res)=>{
   const Useremail  = req.body.email;
   console.log(Useremail)
+  console.log("nijmn");
   try {
   const existingUser = await userModel.findOne({ email:Useremail});
-  const token = req.cookies.token;
-  console.log(token)
+  const token = req.cookies.token;  
+  // console.log(token)
 
   if (!existingUser ) {
     
@@ -221,7 +167,7 @@ const getUser = async(req,res) =>{
 
 const data = await userModel.find()
 
-console.log(data);
+// console.log(data);
 
 }
 
