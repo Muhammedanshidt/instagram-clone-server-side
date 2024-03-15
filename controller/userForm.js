@@ -176,7 +176,7 @@ const userLogin = async (req, res) => {
     { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
   );
 
-  res.cookie("loginToken", accessToken, { httpOnly: true });
+  res.cookie("token", accessToken);
 
   return res.status(200).json({
     success: true,
@@ -192,10 +192,8 @@ const userAccess = async(req,res)=>{
   const Useremail  = req.body.email;
   console.log(Useremail)
   try {
-
-    const existingUser = await userModel.findOne({ email:Useremail});
+  const existingUser = await userModel.findOne({ email:Useremail});
   const token = req.cookies.token;
-
   console.log(token)
 
   if (!existingUser ) {
@@ -219,9 +217,19 @@ const userAccess = async(req,res)=>{
 }
 
 
+const getUser = async(req,res) =>{
+
+const data = await userModel.find()
+
+console.log(data);
+
+}
+
+
 module.exports = {
   userSignUp,
   userRegByVerification,
   userLogin,
-  userAccess
+  userAccess,
+  getUser
 }
