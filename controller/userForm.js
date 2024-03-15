@@ -1,7 +1,7 @@
 const { config } = require("dotenv");
 const userModel = require("../SchemaModel.js/userModel");
 const nodemailer = require("nodemailer")
-const configJs = require("../config/config")
+const configJs = require("../config/configemail")
 const jwt = require("jsonwebtoken");
 
 config();
