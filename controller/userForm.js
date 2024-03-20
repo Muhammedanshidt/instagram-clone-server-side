@@ -10,8 +10,6 @@ console.log("hai in sign");
 // USER SIGNUP
 const userSignUp = async (req, res) => {
 
-  
-
   try {
     const { email } = req.body;
 
