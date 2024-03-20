@@ -7,8 +7,11 @@ const jwt = require("jsonwebtoken");
 config();
 console.log("hai in sign");
 
+
+
 // USER SIGNUP
 const userSignUp = async (req, res) => {
+  console.log("object")
 
   try {
     const { email } = req.body;
@@ -22,15 +25,18 @@ const userSignUp = async (req, res) => {
       return res.status(400).send("User already exists");
     }
     console.log(email);
+    
 
     // Create transporter
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
+    const transporter = nodemailer.createTransport(
+      {
+      service:"gmail",
       auth: {
-        user: configJs.config.user,
+        user: process.env.EMAIL,
         pass: "ubfb bkcw awmr jqdd",
       },
     });
+    
 
     // Generate OTP
     const generatedOtp = () => Math.floor(100000 + Math.random() * 900000);
@@ -44,7 +50,7 @@ const userSignUp = async (req, res) => {
 
     // Send OTP via email
     const mailOptions = {
-      from: configJs.config.user,
+      from: process.env.EMAIL,
       to: email,
       subject: "OTP",
       text: `Your OTP is: ${otp}`,
@@ -165,6 +171,7 @@ const userAccess = async(req,res)=>{
 const getUser = async(req,res) =>{
 
 const data = await userModel.find()
+res.status(200).send(data)
 
 // console.log(data);
 
