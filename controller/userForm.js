@@ -140,12 +140,13 @@ const userLogin = async (req, res) => {
 
 const userAccess = async(req,res)=>{
   const Useremail  = req.body.email;
-  console.log(Useremail)
-  console.log("nijmn");
+  // console.log(Useremail)
+
+  
   try {
   const existingUser = await userModel.findOne({ email:Useremail});
-  const token = req.cookies.token;  
-  // console.log(token)
+   
+  console.log(existingUser)
 
   if (!existingUser ) {
     
@@ -167,21 +168,76 @@ const userAccess = async(req,res)=>{
  
 }
 
+// user bio setting
+const bioRes =  async (req , res) =>{
+  try{
+let data = req.body.bio ;
+let userId = req.body.userData._id
+        console.log(userId);
+        console.log(data);
 
+        const updateBio = await userModel.findByIdAndUpdate(
+          userId,
+         {bio: data},
+         {new :true },
+        );
+        await updateBio.save()
+        res.status(200).json(updateBio);
+  }catch(err){
+       console.log(err)
+       res.status(500).json({message:"server error"})
+  }
+}
+
+// user logout
+const logBack = (req,res) => {
+  try{
+  res.clearCookie("token").json({ message: "Logged out successfully" });
+  }catch(error){
+    res.status(401).json({ message: 'You are not logged in' })
+  }
+  }
+
+  
+  // profile pic setting
+  const userProfileImage = async (req,res) => {
+    console.log("profile");
+    try {
+      let url = req.body.imageUrl
+      let email = req.body.email
+      console.log(url);
+      const updateProfile = await userModel.findOneAndUpdate(
+        { email: email },
+        { $set: { profileimage: url } },
+        { new: true }
+      )      
+      await updateProfile.save(
+        res.status(200).json(updateProfile)
+      )
+      
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({message:"server error"})
+
+    }
+
+  }
 const getUser = async(req,res) =>{
 
 const data = await userModel.find()
 res.status(200).send(data)
 
-// console.log(data);
+console.log(data);
 
 }
-
 
 module.exports = {
   userSignUp,
   userRegByVerification,
   userLogin,
   userAccess,
+  bioRes,
+  logBack,
+  userProfileImage,
   getUser
 }

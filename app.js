@@ -13,16 +13,17 @@ app.use(cookies());
 //         origin: "https://instagram-clone-client-side.vercel.app",
 //         redentials: true,
 // }))
-// app.use(cors({
-//     origin: "http://localhost:3000", 
-//     credentials: true,
-// }));
+app.use(cors({
+    origin: "http://localhost:3000", 
+    credentials: true,
+}));
 
-app.use(cors())
+// app.use(cors())
 
 //user area
 const routeSingUp = require("./Routes/UserRoute");
 app.use("/user",routeSingUp);
+
 
 
 
