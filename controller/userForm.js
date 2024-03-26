@@ -222,6 +222,10 @@ const logBack = (req,res) => {
     }
 
   }
+
+  // get all sign users
+
+
 const getUser = async(req,res) =>{
 
 const data = await userModel.find()
