@@ -10,5 +10,5 @@ router.route("/getuser").get(controller.getUser);
 router.route("/profile/edit").post(controller.bioRes)
 router.route("/logout").post(controller.logBack)
 router.route("/userProfileImage").post(controller.userProfileImage)
-
+router.route("/findUser").post(controller.userFindByName)
 module.exports = router;

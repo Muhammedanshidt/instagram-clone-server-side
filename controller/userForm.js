@@ -231,8 +231,23 @@ const getUser = async(req,res) =>{
 const data = await userModel.find()
 res.status(200).send(data)
 
-console.log(data);
+// console.log(data);
 
+}
+
+const userFindByName =  async (req , res)=>{
+  const {username} = req.body
+  // console.log(username);
+  
+  if(!username){
+    return res.status(400).json({ message : "No Username provided!" })
+  }else{
+    const founduser = await userModel.findOne({username:username})
+    console.log(founduser);
+    console.log("------------------------");
+        res.status(200)
+        .send(founduser)
+  }
 }
 
 module.exports = {
@@ -243,5 +258,6 @@ module.exports = {
   bioRes,
   logBack,
   userProfileImage,
-  getUser
+  getUser,
+  userFindByName
 }
