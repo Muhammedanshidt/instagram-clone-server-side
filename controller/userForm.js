@@ -243,12 +243,61 @@ const userFindByName =  async (req , res)=>{
     return res.status(400).json({ message : "No Username provided!" })
   }else{
     const founduser = await userModel.findOne({username:username})
-    console.log(founduser);
-    console.log("------------------------");
+    // console.log(founduser);
+    // console.log("------------------------");
         res.status(200)
         .send(founduser)
   }
 }
+
+// following
+
+const userFollow = async (req,res) => {
+  const {user} = req.body
+  const {owner} = req.body
+
+  console.log(owner);
+
+  // const userId = user._id
+  // console.log(userId);
+  try {
+  const following = await userModel.findById(user);
+
+  if(!following){
+    return res.status(400).send( 'no user id' )
+    } 
+    if (following.followers.includes(owner)){
+      return res.status(409).send('User already follows this user')
+    }
+
+    following.followers.push(owner);
+
+    await  following.save();
+    
+    await userModel.findByIdAndUpdate( owner , { $addToSet : { following : user }} );
+    res.status(201).json(following)
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).send('server error')
+  }      
+      
+  }
+
+
+// unfollow
+
+// const userUnfollow = async (req,res) => {
+//   const {index} = req.params;
+  
+//   let follower = await userFindByID(req,res)
+//   // console.log(follower);
+//   follower.following.splice(index,1)
+//   await follower.save();
+//   // console.log(follower.following);
+//   res.status(200).json({message:"unfollow success"})
+// }
+  
 
 module.exports = {
   userSignUp,
@@ -259,5 +308,6 @@ module.exports = {
   logBack,
   userProfileImage,
   getUser,
-  userFindByName
+  userFindByName,
+  userFollow
 }
