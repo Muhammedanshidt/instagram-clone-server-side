@@ -255,25 +255,17 @@ const userFindByName =  async (req , res)=>{
 const userFollow = async (req,res) => {
   const {user} = req.body
   const {owner} = req.body
-
   console.log(owner);
-
-  // const userId = user._id
-  // console.log(userId);
   try {
   const following = await userModel.findById(user);
-
   if(!following){
     return res.status(400).send( 'no user id' )
     } 
     if (following.followers.includes(owner)){
       return res.status(409).send('User already follows this user')
     }
-
     following.followers.push(owner);
-
     await  following.save();
-    
     await userModel.findByIdAndUpdate( owner , { $addToSet : { following : user }} );
     res.status(201).json(following)
   }
@@ -281,9 +273,7 @@ const userFollow = async (req,res) => {
     console.log(err);
     res.status(500).send('server error')
   }      
-      
   }
-
 
 // unfollow
 
