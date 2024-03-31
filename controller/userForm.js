@@ -78,6 +78,8 @@ const userSignUp = async (req, res) => {
 
 const userRegByVerification = async (req, res) => {
 
+  console.log("jggh");
+
   const { userData, otp } = req.body
   console.log(userData, "userdata");
   const token = req.cookies.otpToken;

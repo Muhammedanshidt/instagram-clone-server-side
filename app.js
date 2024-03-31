@@ -8,8 +8,6 @@ app.use(express.json())
 
 app.use(cookies());
 
-
-
 // app.use(cors({
 //         origin: "https://instagram-clone-client-side.vercel.app",
 //         redentials: true,
