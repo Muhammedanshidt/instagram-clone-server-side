@@ -12,7 +12,9 @@ router.route("/logout").post(controller.logBack)
 router.route("/userProfileImage").post(controller.userProfileImage)
 router.route("/findUser").post(controller.userFindByName)
 router.route("/follow").put(controller.userFollow)
+router.route("/unfollow").delete(controller.userUnfollow)
 router.route("/getfollowers").get(controller.getFollowers)
+router.route("/getfollowing").get(controller.getFollowing)
 
 
 module.exports = router;

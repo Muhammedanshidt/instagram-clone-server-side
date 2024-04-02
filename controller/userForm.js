@@ -257,7 +257,7 @@ const userFindByName = async (req, res) => {
 const userFollow = async (req, res) => {
   const { user } = req.body
   const { owner } = req.body
-  console.log(owner);
+  // console.log(owner);
   try {
     const following = await userModel.findById(user);
     if (!following) {
@@ -279,40 +279,84 @@ const userFollow = async (req, res) => {
 
 // unfollow
 
-// const userUnfollow = async (req,res) => {
-//   const {index} = req.params;
+const userUnfollow = async (req, res) => {
 
-//   let follower = await userFindByID(req,res)
-//   // console.log(follower);
-//   follower.following.splice(index,1)
-//   await follower.save();
-//   // console.log(follower.following);
-//   res.status(200).json({message:"unfollow success"})
-// }
+  console.log(req.body);
+
+  const { userId } = req.body
+  const { currentUserId } = req.body
+
+  // console.log(userId);
+  // console.log(currentUserId);
+  try {
+
+    await userModel.findByIdAndUpdate(currentUserId, { $pull: { following: userId } });
+    await userModel.findByIdAndUpdate(userId, { $pull: { followers: currentUserId } });
+
+    res.status(200).json({ message: "Unfollowed successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to unfollow user" });
+  }
+};
+
+
+
+
+// let follower = await userFindByID(req,res)
+// // console.log(follower);
+// follower.following.splice(index,1)
+// await follower.save();
+// // console.log(follower.following);
+// res.status(200).json({message:"unfollow success"})
 
 // get user folowers
 
-const getFollowers = async (req,res) => {
-// console.log("this is back");
-if (req.query.owner && req.query.owner.followers) {
-  try {
-    const followers = req.query.owner.followers;
-    console.log(followers);
-    // const findFollowers =  await userModel.findOne({_id : owner});
-    const findFollowers =  await userModel.find({_id:{$in:followers}});
-    console.log(findFollowers);
-    return res.status(200).json(findFollowers)
-    
-  } catch (error) {
-    console.log(error);
-    return res.status(400).json({ message: "Error getting Followers" })
+const getFollowers = async (req, res) => {
+  if (req.query.owner && req.query.owner.followers) {
+    try {
+      const followers = req.query.owner.followers;
+      console.log(followers);
+      
+      const findFollowers = await userModel.find({ _id: { $in: followers } });
+      console.log(findFollowers);
+      return res.status(200).json(findFollowers)
+
+    } catch (error) {
+      console.log(error);
+      return res.status(400).json({ message: "Error getting Followers" })
+    }
+
+  } else {
+
+    console.log("no followers");
   }
+}
 
-}else {
+const getFollowing = async (req, res) => {
 
-console.log("no followers");
+  if(req.query.owner && req.query.owner.followers){
+  try {
+  const following = req.query.owner.following;
+    const findFollowing = await userModel.find({_id: {$in:following}});
+    
+    if (!findFollowing){
+        return res.status(400).json({message:'User not found'});
+    }else{
+      return res.status(200).json(following.following)
+    }
+    
+  
+  }catch(err){
+    console.log(err);
+    return res.status(500).json({message:'Server Error'})
+  }
 }
 }
+
+
+
+
 
 
 module.exports = {
@@ -326,5 +370,7 @@ module.exports = {
   getUser,
   userFindByName,
   userFollow,
-  getFollowers
+  userUnfollow,
+  getFollowers,
+  getFollowing
 }
