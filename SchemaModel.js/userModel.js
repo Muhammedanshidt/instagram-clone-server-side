@@ -48,6 +48,7 @@ followers : [
          ref: 'User'
    },
 ] ,
+
 following :[{
    type: mongoos.Schema.Types.ObjectId,
    ref: 'User',

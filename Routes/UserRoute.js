@@ -15,6 +15,7 @@ router.route("/follow").put(controller.userFollow)
 router.route("/unfollow").delete(controller.userUnfollow)
 router.route("/getfollowers").get(controller.getFollowers)
 router.route("/getfollowing").get(controller.getFollowing)
+router.route("/post").post(controller.creatPost)
 
 
 module.exports = router;

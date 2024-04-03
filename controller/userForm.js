@@ -1,5 +1,6 @@
 const { config } = require("dotenv");
 const userModel = require("../SchemaModel.js/userModel");
+const postSchema = require("../SchemaModel.js/postModel")
 const nodemailer = require("nodemailer")
 const configJs = require("../config/configemail")
 const jwt = require("jsonwebtoken");
@@ -300,17 +301,8 @@ const userUnfollow = async (req, res) => {
   }
 };
 
+// get followers
 
-
-
-// let follower = await userFindByID(req,res)
-// // console.log(follower);
-// follower.following.splice(index,1)
-// await follower.save();
-// // console.log(follower.following);
-// res.status(200).json({message:"unfollow success"})
-
-// get user folowers
 
 const getFollowers = async (req, res) => {
   if (req.query.owner && req.query.owner.followers) {
@@ -333,18 +325,18 @@ const getFollowers = async (req, res) => {
   }
 }
 
+// get followings
+
+
 const getFollowing = async (req, res) => {
 
   if(req.query.owner && req.query.owner.followers){
+    
   try {
   const following = req.query.owner.following;
     const findFollowing = await userModel.find({_id: {$in:following}});
-    
-    if (!findFollowing){
-        return res.status(400).json({message:'User not found'});
-    }else{
-      return res.status(200).json(following.following)
-    }
+    // console.log(findFollowing);
+      return res.status(200).json(findFollowing)
     
   
   }catch(err){
@@ -354,10 +346,11 @@ const getFollowing = async (req, res) => {
 }
 }
 
+// user post photo
 
-
-
-
+const creatPost = async (req,res) => {
+  console.log(req.body);
+}
 
 module.exports = {
   userSignUp,
@@ -372,5 +365,6 @@ module.exports = {
   userFollow,
   userUnfollow,
   getFollowers,
-  getFollowing
+  getFollowing,
+  creatPost
 }
