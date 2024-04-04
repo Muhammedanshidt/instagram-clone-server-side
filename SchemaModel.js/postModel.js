@@ -8,6 +8,11 @@ const  postSchema = new mongoos.Schema({
     caption:{
         type:'string',
     },
+    userId:{
+        type : mongoos.Types.ObjectId , 
+        ref : "User"
+
+    },
     like:{
         userId:[{type : mongoos.Types.ObjectId , ref : "User"}],
         count: {

@@ -349,7 +349,35 @@ const getFollowing = async (req, res) => {
 // user post photo
 
 const creatPost = async (req,res) => {
-  console.log(req.body);
+  const {caption} = req.body
+  const {id} = req.body
+  const {imageUrl} = req.body
+
+
+
+  console.log(id); 
+  console.log(caption);
+  console.log(imageUrl);
+
+try{
+  const createPost  = postSchema.create({
+    caption : caption ,
+    userId : id ,
+    imgUrl : imageUrl
+  })
+
+  if(creatPost){
+   return res.status(200).json({message: 'post created'})
+  }else{
+    return res.status(400).json({message:"failed to create"});
+  }
+} catch(e){
+  console.log('error in creating a  ')}
+
+
+  // const user = await userModel.findById(id)
+  // console.log(user);
+
 }
 
 module.exports = {
