@@ -16,6 +16,8 @@ router.route("/unfollow").delete(controller.userUnfollow)
 router.route("/getfollowers").get(controller.getFollowers)
 router.route("/getfollowing").get(controller.getFollowing)
 router.route("/post").post(controller.creatPost)
+router.route("/getUserPost").get(controller.getUserPost)
+// router.param('userId', controller.checkIDParam).get(controller.getOneUserData) // get user data by id
 
 
 module.exports = router;

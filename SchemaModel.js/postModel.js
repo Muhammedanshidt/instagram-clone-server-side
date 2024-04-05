@@ -30,6 +30,6 @@ const  postSchema = new mongoos.Schema({
           }
       }
     ],
-    save: [{type : mongoos.Types.ObjectId , ref : "User"}]
+    saveBy: [{type : mongoos.Types.ObjectId , ref : "User"}]
 })
 module.exports= mongoos.model('Post',postSchema)

@@ -337,9 +337,9 @@ const getFollowing = async (req, res) => {
     const findFollowing = await userModel.find({_id: {$in:following}});
     // console.log(findFollowing);
       return res.status(200).json(findFollowing)
-    
-  
-  }catch(err){
+
+  }
+  catch(err){
     console.log(err);
     return res.status(500).json({message:'Server Error'})
   }
@@ -353,30 +353,55 @@ const creatPost = async (req,res) => {
   const {id} = req.body
   const {imageUrl} = req.body
 
-
-
   console.log(id); 
   console.log(caption);
   console.log(imageUrl);
 
-try{
-  const createPost  = postSchema.create({
-    caption : caption ,
-    userId : id ,
-    imgUrl : imageUrl
-  })
-
-  if(creatPost){
-   return res.status(200).json({message: 'post created'})
-  }else{
-    return res.status(400).json({message:"failed to create"});
+  try {
+    const createPost = await postSchema.create({
+      caption: caption,
+      userId: id,
+      imgUrl: imageUrl
+    });
+    
+    console.log(id);
+    
+    const userUpdate = await userModel.findByIdAndUpdate(
+      id,
+      { $addToSet: { post: createPost._id } }
+    );
+  
+    if (userUpdate) {
+      return res.status(200).json({ message: 'Post created and user updated' });
+    } else {
+      return res.status(400).json({ message: 'Failed to create post' });
+    }
+  
+  } catch (e) {
+    console.log('Error in creating a post:', e);
   }
-} catch(e){
-  console.log('error in creating a  ')}
-
-
+  
+}
   // const user = await userModel.findById(id)
   // console.log(user);
+
+
+
+const getUserPost = async  (req,res)=>{
+console.log("thazheund mone");
+const {ownerId} = req.query
+console.log(ownerId,"kwheduywefuy");
+
+try {
+  const posts=await postSchema.find({userId: ownerId})
+  // console.log(posts,'hjgfdghd');
+  res.status(201).json(posts)
+  
+} catch (error) {
+  console.log(error);
+  
+}
+
 
 }
 
@@ -394,5 +419,6 @@ module.exports = {
   userUnfollow,
   getFollowers,
   getFollowing,
-  creatPost
+  creatPost,
+  getUserPost
 }
