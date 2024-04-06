@@ -232,9 +232,10 @@ const userProfileImage = async (req, res) => {
 const getUser = async (req, res) => {
 
   const data = await userModel.find()
+  
   res.status(200).send(data)
 
-  // console.log(data);
+  console.log(data,"uyyuyuuhy");
 
 }
 
@@ -393,8 +394,8 @@ const {ownerId} = req.query
 console.log(ownerId,"kwheduywefuy");
 
 try {
-  const posts=await postSchema.find({userId: ownerId})
-  // console.log(posts,'hjgfdghd');
+  const posts= await postSchema.find({userId: ownerId})
+  console.log(posts,'hjgfdghd');
   res.status(201).json(posts)
   
 } catch (error) {
@@ -404,6 +405,21 @@ try {
 
 
 }
+
+// get explore post
+ 
+ const explorePost = async (req,res) => {
+    
+try {
+
+  const data = await postSchema.find()
+  res.status(200).send(data)
+  
+} catch (error) {
+  console.log(error);
+  res.status(400).send(error)
+}  
+ };
 
 module.exports = {
   userSignUp,
@@ -420,5 +436,6 @@ module.exports = {
   getFollowers,
   getFollowing,
   creatPost,
-  getUserPost
+  getUserPost,
+  explorePost
 }
