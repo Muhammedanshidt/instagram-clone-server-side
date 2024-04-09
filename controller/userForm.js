@@ -422,19 +422,37 @@ try {
 
  const  likeHandler = async (req,res) => {
   try{
-  // console.log(req.body,"uihwediue");
-
+  
     const {ownerId} = req.body
     console.log(ownerId,"owner");
     const {postId} = req.body
     console.log(postId,"post");
+
+    const post = await userModel.findByIdAndUpdate(
+      ownerId,{
+        $push:{likes: postId }
+      },{new : true}
+    )
+
+    if(!post){
+      return res.status(400).json({message:"User not found"})
+    }else{
+      
+      const updatedPost=await postSchema.findByIdAndUpdate(postId ,{
+          $inc:{likeCount:1},
+          like:ownerId
+    })
+      .populate("like")
+
+      res.status(200).json(updatedPost)
+
+  const owner = await userModel.findByIdAndUpdate()
+  }
   }
   catch(err){
-    log(err)
+    console.log(err)
   }
-
- }
-
+}
 
 
 module.exports = {
