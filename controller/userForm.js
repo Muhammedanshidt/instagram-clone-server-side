@@ -389,21 +389,17 @@ const creatPost = async (req,res) => {
 
 
 const getUserPost = async  (req,res)=>{
-console.log("thazheund mone");
 const {ownerId} = req.query
-console.log(ownerId,"kwheduywefuy");
+console.log(ownerId);
 
 try {
   const posts= await postSchema.find({userId: ownerId})
-  console.log(posts,'hjgfdghd');
+  // console.log(posts,'hjgfdghd');
   res.status(201).json(posts)
   
 } catch (error) {
-  console.log(error);
-  
+  console.log(error); 
 }
-
-
 }
 
 // get explore post
@@ -421,6 +417,26 @@ try {
 }  
  };
 
+
+ // post like
+
+ const  likeHandler = async (req,res) => {
+  try{
+  // console.log(req.body,"uihwediue");
+
+    const {ownerId} = req.body
+    console.log(ownerId,"owner");
+    const {postId} = req.body
+    console.log(postId,"post");
+  }
+  catch(err){
+    log(err)
+  }
+
+ }
+
+
+
 module.exports = {
   userSignUp,
   userRegByVerification,
@@ -437,5 +453,6 @@ module.exports = {
   getFollowing,
   creatPost,
   getUserPost,
-  explorePost
+  explorePost,
+  likeHandler
 }
