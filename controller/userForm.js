@@ -472,5 +472,5 @@ module.exports = {
   creatPost,
   getUserPost,
   explorePost,
-  likeHandler
-}
+  likeHandler,
+};
