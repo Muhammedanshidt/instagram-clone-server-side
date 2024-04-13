@@ -13,13 +13,7 @@ const  postSchema = new mongoos.Schema({
         ref : "User"
 
     },
-    like:{
-        userId:[{type : mongoos.Types.ObjectId , ref : "User"}],
-        count: {
-            type : Number ,
-            default : 0
-        }
-    },
+    like:[{type : mongoos.Types.ObjectId , ref : "User"}],
     comments : [
       {  
           userId : { type: mongoos.Types.ObjectId ,ref :"User"},

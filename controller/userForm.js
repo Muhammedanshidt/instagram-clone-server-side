@@ -428,26 +428,24 @@ try {
     const {postId} = req.body
     console.log(postId,"post");
 
-    const post = await userModel.findByIdAndUpdate(
-      ownerId,{
-        $push:{likes: postId }
-      },{new : true}
-    )
-
-    if(!post){
-      return res.status(400).json({message:"User not found"})
+    const checkOwner = await userModel.findOne({likes:postId})
+    if(!checkOwner){
+    const updated = await userModel.findByIdAndUpdate(ownerId,{$push: {likes:postId}},{new:true});
     }else{
-      
-      const updatedPost=await postSchema.findByIdAndUpdate(postId ,{
-          $inc:{likeCount:1},
-          like:ownerId
-    })
-      .populate("like")
+      console.log("already liked");
+    }
+    const checkPost = await postSchema.findOne({like:ownerId})
+    if(!checkPost){
+    const result = await postSchema.findByIdAndUpdate(postId, {$push : {like:ownerId}},{new:true});
+      //  await postSchema.findByIdAndUpdate(postId,{ $push:{like: ownerId}});
+    } 
+    
+    // console.log(result,"result");
+    // console.log(updated, "update");
+    
+    // console.log(updated,"update");
+    
 
-      res.status(200).json(updatedPost)
-
-  const owner = await userModel.findByIdAndUpdate()
-  }
   }
   catch(err){
     console.log(err)
