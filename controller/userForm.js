@@ -437,7 +437,8 @@ try {
     const checkPost = await postSchema.findOne({like:ownerId})
     if(!checkPost){
     const result = await postSchema.findByIdAndUpdate(postId, {$push : {like:ownerId}},{new:true});
-      //  await postSchema.findByIdAndUpdate(postId,{ $push:{like: ownerId}});
+    }else{
+      console.log("already liked user");
     } 
     
     // console.log(result,"result");
