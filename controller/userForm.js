@@ -420,36 +420,35 @@ try {
 
  // post like
 
- const  likeHandler = async (req,res) => {
-  try{
-  
-    const {ownerId} = req.body
-    console.log(ownerId,"owner");
-    const {postId} = req.body
-    console.log(postId,"post");
+ const likeHandler = async (req, res) => {
+  try {
+    const { ownerId, postId } = req.body;
 
-    const checkOwner = await userModel.findOne({likes:postId})
-    if(!checkOwner){
-    const updated = await userModel.findByIdAndUpdate(ownerId,{$push: {likes:postId}},{new:true});
-    }else{
-      console.log("already liked");
+    const checkOwner = await userModel.findOne({ _id: ownerId, likes: postId });
+    if (!checkOwner) {
+      await userModel.findByIdAndUpdate(ownerId, { $push: { likes: postId } });
+    } else {
+      console.log("User already liked this post");
+      const user = await userModel.findById(ownerId).populate("post");
+      console.log(user, "eraa===========");
     }
-    const checkPost = await postSchema.findOne({like:ownerId})
-    if(!checkPost){
-    const result = await postSchema.findByIdAndUpdate(postId, {$push : {like:ownerId}},{new:true});
-    }else{
-      console.log("already liked user");
-    } 
-    
-    // console.log(result,"result");
-    // console.log(updated, "update");
-    
-    // console.log(updated,"update");
-    
 
+    const checkPost = await postSchema.findOne({ _id: postId, like: ownerId });
+    if (!checkPost) {
+      await postSchema.findByIdAndUpdate(postId, { $push: { like: ownerId } });
+    } else {
+      console.log("Post already liked by this user");
+      const ab = await postSchema.find();
+      console.log(ab);
+        }
+    const updatedUser  = await userModel.findById(ownerId)
+    const  updatedPost = await postSchema.findById(postId)
+    res.status(201).json({ message : "success", data : {user:updatedUser , post:updatedPost }});
+        
   }
   catch(err){
     console.log(err)
+    res.status(500).json({ error: "Internal Server Error" })
   }
 }
 
