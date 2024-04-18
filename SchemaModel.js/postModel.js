@@ -16,7 +16,7 @@ const  postSchema = new mongoos.Schema({
     like:[{type : mongoos.Types.ObjectId , ref : "User"}],
     comments : [
       {  
-          userId : { type: mongoos.Types.ObjectId ,ref :"User"},
+        userId : { type: mongoos.Types.ObjectId ,ref :"User"},
           text : String,
           createdAt : {
               type : Date ,

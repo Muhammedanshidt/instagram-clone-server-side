@@ -19,6 +19,7 @@ router.route("/post").post(controller.creatPost)
 router.route("/getUserPost").get(controller.getUserPost)
 router.route("/getExplorePost").get(controller.explorePost)
 router.route("/userLike").post(controller.likeHandler)
+router.route("/userComment").post(controller.commentHandle)
 // router.param('userId', controller.checkIDParam).get(controller.getOneUserData) // get user data by id
 
 

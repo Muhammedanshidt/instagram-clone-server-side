@@ -451,6 +451,27 @@ try {
     res.status(500).json({ error: "Internal Server Error" })
   }
 }
+// post comment
+
+const commentHandle = async (req,res) => {
+
+  try{
+   const  {ownerId, postId, commentvalue} = req.body
+
+   await postSchema.findByIdAndUpdate(postId, { $push: { comments :{ userId:ownerId,text:commentvalue }} });
+   const postData = await postSchema.findById(postId)
+   const userData = await userModel.findById(ownerId)
+
+   res.status(201).json({ message : "success", data:{user:userData,post:postData}});
+
+  }
+  catch(err){
+    res.status(400).json({error:"Bad Request"})
+  }
+
+
+
+}
 
 
 module.exports = {
@@ -471,4 +492,5 @@ module.exports = {
   getUserPost,
   explorePost,
   likeHandler,
+  commentHandle
 };
