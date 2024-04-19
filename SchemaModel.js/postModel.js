@@ -17,6 +17,7 @@ const  postSchema = new mongoos.Schema({
     comments : [
       {  
         userId : { type: mongoos.Types.ObjectId ,ref :"User"},
+        postId: {type: mongoos.Types.ObjectId ,ref :"Post"},
           text : String,
           createdAt : {
               type : Date ,

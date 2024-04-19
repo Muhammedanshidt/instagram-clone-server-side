@@ -38,7 +38,7 @@ profileimage:{
 },
 
 post: [{type: mongoos.Types.ObjectId, ref:'Post'}],
-// comments: [{type: mongoos.Types.ObjectId,ref:"Comment"}],
+comments: [{type: mongoos.Types.ObjectId,ref:"Comment"}],
 likes: [{type:mongoos.Types.ObjectId,ref:'Post'}],
 saved: [{type: mongoos.Types.ObjectId,ref:'Post'}],
 

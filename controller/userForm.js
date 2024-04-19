@@ -389,13 +389,19 @@ const creatPost = async (req,res) => {
 
 
 const getUserPost = async  (req,res)=>{
-const {ownerId} = req.query
-console.log(ownerId);
+
+  const { Id, postId } = req.query;
+  console.log(Id);
+  console.log(postId);
+  
 
 try {
-  const posts= await postSchema.find({userId: ownerId})
+  const posts= await postSchema.find({userId: Id})
   // console.log(posts,'hjgfdghd');
-  res.status(201).json(posts)
+  // const postId = await postSchema.find()
+  const postData = await postSchema.findById(postId).populate('comments.userId');
+
+  res.status(201).json({posts:posts,postData:postData})
   
 } catch (error) {
   console.log(error); 
@@ -458,11 +464,13 @@ const commentHandle = async (req,res) => {
   try{
    const  {ownerId, postId, commentvalue} = req.body
 
-   await postSchema.findByIdAndUpdate(postId, { $push: { comments :{ userId:ownerId,text:commentvalue }} });
-   const postData = await postSchema.findById(postId)
+   await postSchema.findByIdAndUpdate(postId, { $push: { comments :{ userId:ownerId,text:commentvalue ,postId:postId}} });
+   const postData = await postSchema.findById(postId).populate('comments.userId');
    const userData = await userModel.findById(ownerId)
+   
+   console.log(postData,"hai");
 
-   res.status(201).json({ message : "success", data:{user:userData,post:postData}});
+   res.status(201).json({ message : "success", user:userData,post:postData});
 
   }
   catch(err){
