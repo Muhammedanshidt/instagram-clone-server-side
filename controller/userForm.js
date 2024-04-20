@@ -466,7 +466,7 @@ const commentHandle = async (req,res) => {
 
    await postSchema.findByIdAndUpdate(postId, { $push: { comments :{ userId:ownerId,text:commentvalue ,postId:postId}} });
    const postData = await postSchema.findById(postId).populate('comments.userId');
-   const userData = await userModel.findById(ownerId)
+   const userData = await userModel.findById(ownerId).populate('comments.userId')
    
    console.log(postData,"hai");
 
