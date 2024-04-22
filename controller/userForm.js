@@ -232,10 +232,10 @@ const userProfileImage = async (req, res) => {
 const getUser = async (req, res) => {
 
   const data = await userModel.find()
-  
+
   res.status(200).send(data)
 
-  console.log(data,"uyyuyuuhy");
+  console.log(data, "uyyuyuuhy");
 
 }
 
@@ -310,7 +310,7 @@ const getFollowers = async (req, res) => {
     try {
       const followers = req.query.owner.followers;
       console.log(followers);
-      
+
       const findFollowers = await userModel.find({ _id: { $in: followers } });
       console.log(findFollowers);
       return res.status(200).json(findFollowers)
@@ -331,30 +331,30 @@ const getFollowers = async (req, res) => {
 
 const getFollowing = async (req, res) => {
 
-  if(req.query.owner && req.query.owner.followers){
-    
-  try {
-  const following = req.query.owner.following;
-    const findFollowing = await userModel.find({_id: {$in:following}});
-    // console.log(findFollowing);
+  if (req.query.owner && req.query.owner.followers) {
+
+    try {
+      const following = req.query.owner.following;
+      const findFollowing = await userModel.find({ _id: { $in: following } });
+      // console.log(findFollowing);
       return res.status(200).json(findFollowing)
 
+    }
+    catch (err) {
+      console.log(err);
+      return res.status(500).json({ message: 'Server Error' })
+    }
   }
-  catch(err){
-    console.log(err);
-    return res.status(500).json({message:'Server Error'})
-  }
-}
 }
 
 // user post photo
 
-const creatPost = async (req,res) => {
-  const {caption} = req.body
-  const {id} = req.body
-  const {imageUrl} = req.body
+const creatPost = async (req, res) => {
+  const { caption } = req.body
+  const { id } = req.body
+  const { imageUrl } = req.body
 
-  console.log(id); 
+  console.log(id);
   console.log(caption);
   console.log(imageUrl);
 
@@ -364,69 +364,69 @@ const creatPost = async (req,res) => {
       userId: id,
       imgUrl: imageUrl
     });
-    
+
     console.log(id);
-    
+
     const userUpdate = await userModel.findByIdAndUpdate(
       id,
       { $addToSet: { post: createPost._id } }
     );
-  
+
     if (userUpdate) {
       return res.status(200).json({ message: 'Post created and user updated' });
     } else {
       return res.status(400).json({ message: 'Failed to create post' });
     }
-  
+
   } catch (e) {
     console.log('Error in creating a post:', e);
   }
-  
+
 }
-  // const user = await userModel.findById(id)
-  // console.log(user);
+// const user = await userModel.findById(id)
+// console.log(user);
 
 
 
-const getUserPost = async  (req,res)=>{
+const getUserPost = async (req, res) => {
 
   const { Id, postId } = req.query;
   console.log(Id);
   console.log(postId);
-  
 
-try {
-  const posts= await postSchema.find({userId: Id})
-  // console.log(posts,'hjgfdghd');
-  // const postId = await postSchema.find()
-  const postData = await postSchema.findById(postId).populate('comments.userId');
 
-  res.status(201).json({posts:posts,postData:postData})
-  
-} catch (error) {
-  console.log(error); 
-}
+  try {
+    const posts = await postSchema.find({ userId: Id })
+    // console.log(posts,'hjgfdghd');
+    // const postId = await postSchema.find()
+    const postData = await postSchema.findById(postId).populate('comments.userId');
+
+    res.status(201).json({ posts: posts, postData: postData })
+
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 // get explore post
- 
- const explorePost = async (req,res) => {
-    
-try {
 
-  const data = await postSchema.find()
-  res.status(200).send(data)
-  
-} catch (error) {
-  console.log(error);
-  res.status(400).send(error)
-}  
- };
+const explorePost = async (req, res) => {
+
+  try {
+
+    const data = await postSchema.find()
+    res.status(200).send(data)
+
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error)
+  }
+};
 
 
- // post like
+// post like
 
- const likeHandler = async (req, res) => {
+const likeHandler = async (req, res) => {
   try {
     const { ownerId, postId } = req.body;
 
@@ -446,40 +446,56 @@ try {
       console.log("Post already liked by this user");
       const ab = await postSchema.find();
       console.log(ab);
-        }
-    const updatedUser  = await userModel.findById(ownerId)
-    const  updatedPost = await postSchema.findById(postId)
-    res.status(201).json({ message : "success", data : {user:updatedUser , post:updatedPost }});
-        
+    }
+    const updatedUser = await userModel.findById(ownerId)
+    const updatedPost = await postSchema.findById(postId)
+    res.status(201).json({ message: "success", data: { user: updatedUser, post: updatedPost } });
+
   }
-  catch(err){
+  catch (err) {
     console.log(err)
     res.status(500).json({ error: "Internal Server Error" })
   }
 }
 // post comment
 
-const commentHandle = async (req,res) => {
+const commentHandle = async (req, res) => {
 
-  try{
-   const  {ownerId, postId, commentvalue} = req.body
+  try {
+    const { ownerId, postId, commentvalue } = req.body
 
-   await postSchema.findByIdAndUpdate(postId, { $push: { comments :{ userId:ownerId,text:commentvalue ,postId:postId}} });
-   const postData = await postSchema.findById(postId).populate('comments.userId');
-   const userData = await userModel.findById(ownerId).populate('comments.userId')
-   
-   console.log(postData,"hai");
+    await postSchema.findByIdAndUpdate(postId, { $push: { comments: { userId: ownerId, text: commentvalue, postId: postId } } });
+    const postData = await postSchema.findById(postId).populate('comments.userId');
+    const userData = await userModel.findById(ownerId).populate('comments.userId')
 
-   res.status(201).json({ message : "success", user:userData,post:postData});
+    console.log(postData, "hai");
+
+    res.status(201).json({ message: "success", user: userData, post: postData });
 
   }
-  catch(err){
-    res.status(400).json({error:"Bad Request"})
+  catch (err) {
+    res.status(400).json({ error: "Bad Request" })
   }
 
 
 
 }
+const getUserSearch = async (req, res, next) => {
+  try {
+    const searchText = req.query.userName || "";
+    console.log(searchText);
+
+    const searchRegex = new RegExp(searchText, 'i')
+    const lisitng = await userModel.find({ username: searchRegex });
+
+
+
+    res.status(200).json(lisitng);
+  } catch (err) {
+    next(err);
+  }
+};
+
 
 
 module.exports = {
@@ -500,5 +516,6 @@ module.exports = {
   getUserPost,
   explorePost,
   likeHandler,
-  commentHandle
+  commentHandle,
+  getUserSearch
 };
