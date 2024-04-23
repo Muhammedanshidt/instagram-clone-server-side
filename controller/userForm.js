@@ -240,8 +240,9 @@ const getUser = async (req, res) => {
 }
 
 const userFindByName = async (req, res) => {
+  
   const { username } = req.body
-  // console.log(username);
+    console.log(username,"uuuucurrent level");
 
   if (!username) {
     return res.status(400).json({ message: "No Username provided!" })
@@ -388,25 +389,19 @@ const creatPost = async (req, res) => {
 
 
 
-const getUserPost = async (req, res) => {
-
-  const { Id, postId } = req.query;
-  console.log(Id);
-  console.log(postId);
-
-
+const getUserPost = async  (req,res)=>{
+  const {ownerId} = req.query
+  console.log(ownerId);
+  
   try {
-    const posts = await postSchema.find({ userId: Id })
+    const posts= await postSchema.find({userId: ownerId})
     // console.log(posts,'hjgfdghd');
-    // const postId = await postSchema.find()
-    const postData = await postSchema.findById(postId).populate('comments.userId');
-
-    res.status(201).json({ posts: posts, postData: postData })
-
+    res.status(201).json(posts)
+    
   } catch (error) {
-    console.log(error);
+    console.log(error); 
   }
-}
+  }
 
 // get explore post
 
@@ -414,7 +409,8 @@ const explorePost = async (req, res) => {
 
   try {
 
-    const data = await postSchema.find()
+    const data = await postSchema.find().populate("userId")
+    
     res.status(200).send(data)
 
   } catch (error) {
@@ -430,33 +426,64 @@ const likeHandler = async (req, res) => {
   try {
     const { ownerId, postId } = req.body;
 
-    const checkOwner = await userModel.findOne({ _id: ownerId, likes: postId });
-    if (!checkOwner) {
-      await userModel.findByIdAndUpdate(ownerId, { $push: { likes: postId } });
-    } else {
-      console.log("User already liked this post");
-      const user = await userModel.findById(ownerId).populate("post");
-      console.log(user, "eraa===========");
-    }
+    const user = await userModel.findById(ownerId);
+    const post = await postSchema.findById(postId);
 
-    const checkPost = await postSchema.findOne({ _id: postId, like: ownerId });
-    if (!checkPost) {
+  
+    const Liked = user.likes.includes(postId);
+
+    if (!Liked) {
+    
+      await userModel.findByIdAndUpdate(ownerId, { $push: { likes: postId } });
       await postSchema.findByIdAndUpdate(postId, { $push: { like: ownerId } });
     } else {
-      console.log("Post already liked by this user");
-      const ab = await postSchema.find();
-      console.log(ab);
+      
+      await userModel.findByIdAndUpdate(ownerId, { $pull: { likes: postId } });
+      await postSchema.findByIdAndUpdate(postId, { $pull: { like: ownerId } });
     }
-    const updatedUser = await userModel.findById(ownerId)
-    const updatedPost = await postSchema.findById(postId)
+
+    
+    const updatedUser = await userModel.findById(ownerId);
+    const updatedPost = await postSchema.findById(postId);
+
     res.status(201).json({ message: "success", data: { user: updatedUser, post: updatedPost } });
 
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-  catch (err) {
-    console.log(err)
-    res.status(500).json({ error: "Internal Server Error" })
+};
+
+
+// own acconunt post
+
+const getOwnPost = async (req, res) => {
+  console.log("oooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+  const { Id } = req.query;
+
+  console.log(Id, '=============');
+
+
+  try {
+    const postData = await userModel.findById(Id).populate("post");
+    console.log("------------------------------------------");
+    console.log(postData, "postdata");
+    console.log("------------------------------------------");
+
+    if (postData && postData.post) {
+      res.status(200).json({ post: postData.post });
+    } else {
+      res.status(404).json({ message: "Post not found" });
+    }
+  } catch (error) {
+    console.error("Error fetching post:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+};
+
+
+
+
 // post comment
 
 const commentHandle = async (req, res) => {
@@ -484,10 +511,15 @@ const getUserSearch = async (req, res, next) => {
   try {
     const searchText = req.query.userName || "";
     console.log(searchText);
-
-    const searchRegex = new RegExp(searchText, 'i')
+    const searchRegex = new RegExp({searchText}, 'i');
     const lisitng = await userModel.find({ username: searchRegex });
 
+    // if (!lisitng.length) {
+    //   const err = new Error("No users found!");
+    //   err.statusCode = 404; 
+    //   throw err;
+    // }
+    // console.log(lisitng);
 
 
     res.status(200).json(lisitng);
@@ -514,6 +546,7 @@ module.exports = {
   getFollowing,
   creatPost,
   getUserPost,
+  getOwnPost,
   explorePost,
   likeHandler,
   commentHandle,
