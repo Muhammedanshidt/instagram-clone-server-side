@@ -529,6 +529,36 @@ const getUserSearch = async (req, res, next) => {
 };
 
 
+const getPost = async (req,res) => {
+  console.log("from post");
+  try {
+    const {currentPost}  = req.query
+    const  posts=await postSchema.findById(currentPost).populate('userId comments.userId comments.postId');
+    // const  user=await postSchema.findById(currentPost).populate('comments.userId comments.postId');
+    // const  posts=await postSchema.findById(currentPost).populate('comments');
+    console.log("d");
+
+    console.log(posts);
+res.status(200).json(posts);
+
+    
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+const   userNameEdit = async (req, res) => {
+  console.log("Handling username edit request");
+  const { nameUser,nameFull } = req.body;
+  console.log("New username:", nameUser);
+  console.log("New username:", nameFull);
+  
+  
+  
+  res.status(200).send("Username updated successfully");
+}
+
+
 
 module.exports = {
   userSignUp,
@@ -550,5 +580,7 @@ module.exports = {
   explorePost,
   likeHandler,
   commentHandle,
-  getUserSearch
+  getUserSearch,
+  getPost,
+  userNameEdit
 };

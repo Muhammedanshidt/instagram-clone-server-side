@@ -22,6 +22,8 @@ router.route("/userLike").post(controller.likeHandler)
 router.route("/userComment").post(controller.commentHandle)
 router.route("/getOwnPost").get(controller.getOwnPost)
 router.route("/userSearch").get(controller.getUserSearch)
+router.route("/grtPostModal").get(controller.getPost)
+router.route("/editUser").post(controller.userNameEdit)
 // router.param('userId', controller.checkIDParam).get(controller.getOneUserData) // get user data by id
 
 
