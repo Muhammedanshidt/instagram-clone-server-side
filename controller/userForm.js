@@ -491,13 +491,19 @@ const commentHandle = async (req, res) => {
   try {
     const { ownerId, postId, commentvalue } = req.body
 
+    console.log("user", ownerId);
+    console.log("post", postId);
+    console.log("comment",commentvalue);
+
     await postSchema.findByIdAndUpdate(postId, { $push: { comments: { userId: ownerId, text: commentvalue, postId: postId } } });
-    const postData = await postSchema.findById(postId).populate('comments.userId');
-    const userData = await userModel.findById(ownerId).populate('comments.userId')
+    // const postData = await postSchema.findById(postId).populate('comments.userId');
+    // const userData = await userModel.findById(ownerId).populate('comments.userId')
+    const  postData = await postSchema.findById(postId).populate('userId comments.userId comments.postId');
+
 
     console.log(postData, "hai");
 
-    res.status(201).json({ message: "success", user: userData, post: postData });
+    res.status(201).json({ message: "success", postData: postData });
 
   }
   catch (err) {
@@ -547,16 +553,29 @@ res.status(200).json(posts);
     console.log(error);
   }
 }
+
 const   userNameEdit = async (req, res) => {
   console.log("Handling username edit request");
-  const { nameUser,nameFull } = req.body;
+  const { nameUser,nameFull,email } = req.body;
   console.log("New username:", nameUser);
-  console.log("New username:", nameFull);
+  console.log("New fullname:", nameFull);
+  console.log("New email:", email);
+  try{
+
+   const update = await userModel.aggregate([
+    {$match:{email : email}},{$set:{fullname:nameFull,username:nameUser}}
+  ])
+
+  const ckeck = await userModel.findOne({email:email})
+
+  console.log(ckeck)  
   
-  
-  
-  res.status(200).send("Username updated successfully");
-}
+  res.status(200).json({update ,message:"Update success"});
+  }catch(err){
+      console.log(err);
+      res.status(400).json({ message: "Update failed", error: err.message });
+  }
+  }
 
 
 

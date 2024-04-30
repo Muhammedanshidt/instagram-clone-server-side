@@ -22,6 +22,7 @@ const userSchema = mongoos.Schema({
     type:String ,
     required :[true, 'Username field can not be empty'],
     minlength: [4, "Username must be at least 4 characters long"],
+    unique:true
 
  },
     password: {
