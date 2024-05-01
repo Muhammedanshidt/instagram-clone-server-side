@@ -11,14 +11,14 @@ app.use(cookies());
 
 app.use(bodyParser.json());
 
-// app.use(cors({
-//         origin: "https://instagram-clone-client-side.vercel.app",
-//         credentials: true,
-// }))
 app.use(cors({
-    origin: "http://localhost:3000", 
-    credentials: true,
-}));
+        origin: "https://instagram-clone-client-side.vercel.app",
+        credentials: true,
+}))
+// app.use(cors({
+//     origin: "http://localhost:3000", 
+//     credentials: true,
+// }));
 
 // app.use(cors())
 
