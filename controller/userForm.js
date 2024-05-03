@@ -580,24 +580,62 @@ const notification = async (req, res) => {
   try {
     const { id } = req.query
     const Data = await userModel.findById(id)
-    .populate({
-      path: 'post',
-      populate: {
-        path: 'like',
-        model: 'User'
-      }
-    })
-    .populate('followers');
+      .populate({
+        path: 'post',
+        populate: {
+          path: 'like',
+          model: 'User'
+        }
+      })
+      .populate('followers');
 
-   console.log("----------------------------");
-    console.log(Data);
-    console.log("|||||||||||||||||||||||||||||||||");
+    // console.log("----------------------------");
+    // console.log(Data);
+    // console.log("|||||||||||||||||||||||||||||||||");
 
     res.status(200).json(Data)
 
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: 'Server Error' });
+  }
+}
+
+const editCaption = async (req, res) => {
+  try {
+    const {text,userId,postId} = req.body
+
+    console.log(text);
+    console.log(userId)
+    console.log(postId)
+    
+
+    const data = await postSchema.findByIdAndUpdate(postId,{caption: text}, {new: true})
+    // await  userModel.findByIdAndUpdate(userId,{po})
+    res.status(201).send(data)
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const deletePost = async (req, res) => {
+  //   console.log("----------------------------");
+
+  console.log(req.params);
+
+  try {
+    // const 
+    // const postId = req.params.postId
+    // console.log(postId);
+    const { userId, postId } = req.params
+
+    const data = await postSchema.findByIdAndDelete(postId) && await userModel.findByIdAndUpdate(userId, {$pull:{post:postId}})
+    res.status(200).json({ successful: "Deleted Successfully", data: data });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "server error" })
   }
 }
 
@@ -625,5 +663,7 @@ module.exports = {
   getUserSearch,
   getPost,
   userNameEdit,
-  notification
+  notification,
+  editCaption,
+  deletePost
 };
