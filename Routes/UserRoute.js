@@ -27,6 +27,8 @@ router.route("/editUser").post(controller.userNameEdit)
 router.route("/notification").get(controller.notification)
 router.route("/editCaption").put(controller.editCaption)
 router.route("/postDelete/:userId/:postId").delete(controller.deletePost)
+router.route("/commentDelete/:userId/:commentId/:postId").delete(controller.deleteComment)
+router.route("/editComment").put(controller.editComment)
 
 // router.param('userId', controller.checkIDParam).get(controller.getOneUserData) // get user data by id
 

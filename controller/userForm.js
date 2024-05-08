@@ -488,6 +488,8 @@ const getOwnPost = async (req, res) => {
 
 const commentHandle = async (req, res) => {
 
+
+
   try {
     const { ownerId, postId, commentvalue } = req.body
 
@@ -496,12 +498,20 @@ const commentHandle = async (req, res) => {
     console.log("comment", commentvalue);
 
     await postSchema.findByIdAndUpdate(postId, { $push: { comments: { userId: ownerId, text: commentvalue, postId: postId } } });
+
+    const updatePost = await postSchema.findById(postId)
+    const lastCommentId = updatePost.comments[updatePost.comments.length - 1]._id;
+
+    console.log(lastCommentId, "lastcomment");
+    await userModel.findByIdAndUpdate(ownerId, { $push: { comments: lastCommentId } })
     // const postData = await postSchema.findById(postId).populate('comments.userId');
     // const userData = await userModel.findById(ownerId).populate('comments.userId')
-    const postData = await postSchema.findById(postId).populate('userId comments.userId comments.postId');
+    const postData = await postSchema.findById(postId).populate('userId comments.userId comments.postId comments.userId.comments');
 
+    // console.log(';WUIFGUTV');
+    // console.log(postId.comments);
+    // console.log(postData, "hai");
 
-    console.log(postData, "hai");
 
     res.status(201).json({ message: "success", postData: postData });
 
@@ -603,14 +613,14 @@ const notification = async (req, res) => {
 
 const editCaption = async (req, res) => {
   try {
-    const {text,userId,postId} = req.body
+    const { text, userId, postId } = req.body
 
     console.log(text);
     console.log(userId)
     console.log(postId)
-    
 
-    const data = await postSchema.findByIdAndUpdate(postId,{caption: text}, {new: true})
+
+    const data = await postSchema.findByIdAndUpdate(postId, { caption: text }, { new: true })
     // await  userModel.findByIdAndUpdate(userId,{po})
     res.status(201).send(data)
 
@@ -630,13 +640,45 @@ const deletePost = async (req, res) => {
     // console.log(postId);
     const { userId, postId } = req.params
 
-    const data = await postSchema.findByIdAndDelete(postId) && await userModel.findByIdAndUpdate(userId, {$pull:{post:postId}})
+    const data = await postSchema.findByIdAndDelete(postId) && await userModel.findByIdAndUpdate(userId, { $pull: { post: postId } })
     res.status(200).json({ successful: "Deleted Successfully", data: data });
 
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "server error" })
   }
+}
+
+const deleteComment = async (req, res) => {
+  console.log("uiiyggyi");
+  // console.log(req.params, "comment delete params");
+  try {
+    const { userId, commentId, postId } = req.params
+    const userData = await postSchema.findByIdAndUpdate(postId, { $pull: { comments: {_id:commentId} } })
+    const postData = await userModel.findByIdAndUpdate(userId, { $pull: { comments: commentId } })
+
+    res.status(200).json({ successful: "success", postData, userData })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({ message: "Failed to Delete Comment" });
+  }
+}
+
+const editComment = async (req,res) => {
+
+  console.log(req.body);
+  console.log("abc");
+  const {editedComment,postId,commentId} = req.body
+
+  // await postSchema.findByIdAndUpdate(postId,{$pull :{comments:{text:editedComment}}})
+ const data =  await postSchema.findOneAndUpdate(
+    { _id: postId, 'comments._id': commentId },
+    { $set: { 'comments.$.text': editedComment } }
+  );
+
+  res.status(200).json({data:data})
+  
+
 }
 
 
@@ -665,5 +707,7 @@ module.exports = {
   userNameEdit,
   notification,
   editCaption,
-  deletePost
+  deletePost,
+  deleteComment,
+  editComment
 };

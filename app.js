@@ -4,6 +4,9 @@ const cookies = require("cookie-parser")
 const bodyParser = require( 'body-parser' )
 const app = express();
 
+
+
+
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 
@@ -20,12 +23,13 @@ app.use(cors({
     credentials: true,
 }));
 
-// app.use(cors())
 
 //user area
-const routeSingUp = require("./Routes/UserRoute");
-app.use("/user",routeSingUp);
+const routeSingUp = require ("./Routes/UserRoute");
+app.use("/user", routeSingUp);
 
+const routeMessage = require ("./Routes/MessageRoute")
+app.use("/message", routeMessage);
 
 
 
