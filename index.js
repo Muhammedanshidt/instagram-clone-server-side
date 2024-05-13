@@ -9,7 +9,7 @@ dotenv.config({path:"./config/config.env"});
 
 dbConnection()
 
-app.listen(process.env.PORT,()=>{
+app.listen(" https://instagram-clone-server-side-thqi.onrender.com",()=>{
     console.log(`server is up on ${process.env.PORT}`);
 })
 
