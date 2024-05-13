@@ -62,4 +62,4 @@ bio:{
 
 })
 
-module.exports= mongoos.model('User',userSchema )
+   module.exports= mongoos.model('User',userSchema )

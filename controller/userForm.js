@@ -255,6 +255,19 @@ const userFindByName = async (req, res) => {
   }
 }
 
+// findUserById
+
+const userFindById = async (req, res) => {
+  const id = req.params.id; // Correctly extract id from req.params
+  // console.log(id, "11111111111111111111111111111111111111111111111111111111111");
+  try {
+    const user = await userModel.findById(id);
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(400).json({ message: "Invalid ID" });
+  }
+};
+
 // following
 
 const userFollow = async (req, res) => {
@@ -692,6 +705,7 @@ module.exports = {
   userProfileImage,
   getUser,
   userFindByName,
+  userFindById,
   userFollow,
   userUnfollow,
   getFollowers,
