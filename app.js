@@ -15,7 +15,7 @@ app.use(cookies());
 app.use(bodyParser.json());
 
 app.use(cors({
-        origin: "https://instagram-clone-client-side.vercel.app",
+        origin: "https://instagram-clone-client-side.vercel.app/",
         credentials: true,
 }))
 // app.use(cors({
