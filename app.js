@@ -28,8 +28,8 @@ app.use(cors({
 const routeSingUp = require("./Routes/UserRoute");
 app.use("/user", routeSingUp);
 
-const routeMessage = require("./Routes/MessageRoute")
-app.use("/message", routeMessage);
+// const routeMessage = require("./Routes/MessageRoute")
+// app.use("/message", routeMessage);
 
 
 
