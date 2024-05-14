@@ -145,48 +145,49 @@ const userRegByVerification = async (req, res) => {
 //   }
 // };
 
+
 const userLogin = async (req, res) => {
+  console.log("abc");
   const { email, password } = req.body;
-  try {
-    const findUser = await userModel.findOne({ email: email });
 
-    if (!findUser) {
-      return res.status(401).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+  console.log(req.body);
 
-    if (password !== findUser.password) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid Password"
-      });
-    }
+  try{
 
-    const accessToken = jwt.sign(
-      { email: findUser.email, id: findUser._id },
-      process.env.JWT_SECRET
-    );
+  const findUser = await userModel.findOne({ email: email });
+  
 
-    console.log(process.env.JWT_SECRET);
-
-    // Set the token in the response headers
-    res.set('Authorization', `Bearer ${accessToken}`);
-
-    return res.status(200).json({
-      success: true,
-      message: "successful login",
-      accessToken,
-      userid: findUser._id // Changed to _id to match MongoDB field
-    });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({
+  if (!findUser) {
+    return res.status(401).json({
       success: false,
-      message: "Internal Server Error",
+      message: "User not found",
     });
   }
+
+  if (password !== findUser.password) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid Password"
+    });
+  }
+
+  const accessToken = jwt.sign(
+    { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
+  );
+
+  res.cookie("token", accessToken);
+
+  
+
+  return res.status(200).json({
+    success: true,
+    message: "successful login",
+    accessToken,
+    userid: findUser.id
+  });
+}catch(err){
+  console.log(err);
+}
 };
 
 
