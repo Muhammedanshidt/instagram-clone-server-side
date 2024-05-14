@@ -109,34 +109,40 @@ const userRegByVerification = async (req, res) => {
 
 const userLogin = async (req, res) => {
   const { email, password } = req.body;
-  const findUser = await userModel.findOne({ email: email });
+  try {
+    const findUser = await userModel.findOne({ email: email });
 
-  if (!findUser) {
-    return res.status(401).json({
-      success: false,
-      message: "User not found",
+    if (!findUser) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (password !== findUser.password) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid Password"
+      });
+    }
+
+    const accessToken = jwt.sign(
+      { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
+    );
+
+    console.log(process.env.JWT_SECRET);
+
+    res.cookie("token", accessToken);
+
+    return res.status(200).json({
+      success: true,
+      message: "successful login",
+      accessToken,
+      userid: findUser.id
     });
+  } catch (err) {
+    console.log(err);
   }
-
-  if (password !== findUser.password) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid Password"
-    });
-  }
-
-  const accessToken = jwt.sign(
-    { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
-  );
-
-  res.cookie("token", accessToken);
-
-  return res.status(200).json({
-    success: true,
-    message: "successful login",
-    accessToken,
-    userid: findUser.id
-  });
 };
 
 // user access
@@ -667,7 +673,7 @@ const deleteComment = async (req, res) => {
   // console.log(req.params, "comment delete params");
   try {
     const { userId, commentId, postId } = req.params
-    const userData = await postSchema.findByIdAndUpdate(postId, { $pull: { comments: {_id:commentId} } })
+    const userData = await postSchema.findByIdAndUpdate(postId, { $pull: { comments: { _id: commentId } } })
     const postData = await userModel.findByIdAndUpdate(userId, { $pull: { comments: commentId } })
 
     res.status(200).json({ successful: "success", postData, userData })
@@ -677,20 +683,20 @@ const deleteComment = async (req, res) => {
   }
 }
 
-const editComment = async (req,res) => {
+const editComment = async (req, res) => {
 
   console.log(req.body);
   console.log("abc");
-  const {editedComment,postId,commentId} = req.body
+  const { editedComment, postId, commentId } = req.body
 
   // await postSchema.findByIdAndUpdate(postId,{$pull :{comments:{text:editedComment}}})
- const data =  await postSchema.findOneAndUpdate(
+  const data = await postSchema.findOneAndUpdate(
     { _id: postId, 'comments._id': commentId },
     { $set: { 'comments.$.text': editedComment } }
   );
 
-  res.status(200).json({data:data})
-  
+  res.status(200).json({ data: data })
+
 
 }
 
