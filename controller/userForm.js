@@ -107,89 +107,43 @@ const userRegByVerification = async (req, res) => {
 }
 
 
-// const userLogin = async (req, res) => {
-//   const { email, password } = req.body;
-//   try {
-//     const findUser = await userModel.findOne({ email: email });
-
-//     if (!findUser) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "User not found",
-//       });
-//     }
-
-//     if (password !== findUser.password) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Invalid Password"
-//       });
-//     }
-
-//     const accessToken = jwt.sign(
-//       { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
-//     );
-
-//     console.log(process.env.JWT_SECRET);
-
-//     res.cookie("token", accessToken);
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "successful login",
-//       accessToken,
-//       userid: findUser.id
-//     });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
-
-
 const userLogin = async (req, res) => {
-  console.log("abc");
   const { email, password } = req.body;
+  try {
+    const findUser = await userModel.findOne({ email: email });
 
-  console.log(req.body);
+    if (!findUser) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
-  try{
+    if (password !== findUser.password) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid Password"
+      });
+    }
 
-  const findUser = await userModel.findOne({ email: email });
-  
+    const accessToken = jwt.sign(
+      { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
+    );
 
-  if (!findUser) {
-    return res.status(401).json({
-      success: false,
-      message: "User not found",
+    console.log(process.env.JWT_SECRET);
+
+    res.cookie("token", accessToken);
+
+    return res.status(200).json({
+      success: true,
+      message: "successful login",
+      accessToken,
+      userid: findUser.id
     });
+  } catch (err) {
+    console.log(err);
   }
-
-  if (password !== findUser.password) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid Password"
-    });
-  }
-
-  const accessToken = jwt.sign(
-    { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
-  );
-
-  res.cookie("token", accessToken);
-
-  
-
-  return res.status(200).json({
-    success: true,
-    message: "successful login",
-    accessToken,
-    userid: findUser.id
-  });
-}catch(err){
-  console.log(err);
-}
 };
-
 
 // user access
 
