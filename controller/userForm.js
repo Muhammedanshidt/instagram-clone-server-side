@@ -132,7 +132,13 @@ const userLogin = async (req, res) => {
 
     console.log(process.env.JWT_SECRET);
 
-    res.cookie("token", accessToken);
+    res.cookie("token", accessToken,{
+      httpOnly :true ,
+      secure: true,
+      sameSite: 'None', 
+    });
+    
+    // res.setHeader('Authorization', `Bearer ${token}`);
 
     return res.status(200).json({
       success: true,
@@ -150,7 +156,6 @@ const userLogin = async (req, res) => {
 const userAccess = async (req, res) => {
   const Useremail = req.body.email;
   // console.log(Useremail)
-
 
   try {
     const existingUser = await userModel.findOne({ email: Useremail });
