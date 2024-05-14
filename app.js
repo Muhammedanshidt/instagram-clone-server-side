@@ -1,13 +1,13 @@
-const express =  require('express');
+const express = require('express');
 const cors = require("cors")
 const cookies = require("cookie-parser")
-const bodyParser = require( 'body-parser' )
+const bodyParser = require('body-parser')
 const app = express();
 
 
 
 
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 app.use(cookies());
@@ -15,7 +15,7 @@ app.use(cookies());
 app.use(bodyParser.json());
 
 app.use(cors({
-        origin: "https://instagram-clone-client-side.vercel.app/",
+        origin: "https://instagram-clone-client-side.vercel.app",
         credentials: true,
 }))
 // app.use(cors({
@@ -25,10 +25,10 @@ app.use(cors({
 
 
 //user area
-const routeSingUp = require ("./Routes/UserRoute");
+const routeSingUp = require("./Routes/UserRoute");
 app.use("/user", routeSingUp);
 
-const routeMessage = require ("./Routes/MessageRoute")
+const routeMessage = require("./Routes/MessageRoute")
 app.use("/message", routeMessage);
 
 

@@ -10,7 +10,6 @@ const dbConnection = () => {
 
 module.exports = dbConnection
 
-// PORT = https://instagram-clone-server-side-thqi.onrender.com
 
 
 
