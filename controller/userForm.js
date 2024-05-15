@@ -154,7 +154,7 @@ const userLogin = async (req, res) => {
 
 const userAccess = async (req, res) => {
   const Useremail = req.body.email;
-  // console.log(Useremail)
+  console.log(Useremail)
 
   try {
     const existingUser = await userModel.findOne({ email: Useremail });
