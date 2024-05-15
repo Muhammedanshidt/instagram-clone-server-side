@@ -138,7 +138,6 @@ const userLogin = async (req, res) => {
       sameSite: 'None', 
     });
     
-    // res.setHeader('Authorization', `Bearer ${token}`);
 
     return res.status(200).json({
       success: true,
