@@ -168,7 +168,9 @@ const userAccess = async (req, res) => {
       });
     }
 
-    const decodedToken =  jwtDecode(token);
+   
+   const secretKey =  process.env.JWT_SECRET
+   const decodedToken = jwt.verify(token, secretKey);
 
     // Log the token for debugging purposes
     console.log(token);
