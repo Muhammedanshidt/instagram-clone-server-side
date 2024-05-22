@@ -153,33 +153,36 @@ const userLogin = async (req, res) => {
 // user access
 
 const userAccess = async (req, res) => {
-  const Useremail = req.body.email;
-  console.log(Useremail)
 
   try {
-    const existingUser = await userModel.findOne({ email: Useremail });
+    
+    console.log("erty67u890-")
+    console.log(req.cookies);
+    const token = req.cookies.token;
 
-    console.log(existingUser)
+    // Log the token for debugging purposes
+    console.log(token);
 
-    if (!existingUser) {
-
-      return res.status(401).json({ successful: false, error: "Unauthorized" });
-    }
-
+    // Send the token in the response
     res.status(200).json({
-      Data: existingUser,
+      data: token,
       successful: true
     });
 
-
   } catch (error) {
+    // Handle any potential errors
     res.status(500).json({
-      message: 'server got an issue',
+      message: 'Server encountered an issue',
       successful: false
     });
   }
-
 }
+
+
+
+
+
+
 
 // user bio setting
 const bioRes = async (req, res) => {
