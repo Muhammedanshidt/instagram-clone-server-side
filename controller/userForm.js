@@ -171,6 +171,7 @@ const userAccess = async (req, res) => {
     // Send the token in the response
     res.status(200).json({
       data: token,
+      decode:decodeToken,
       successful: true
     });
 
