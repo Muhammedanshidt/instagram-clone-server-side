@@ -162,7 +162,7 @@ const userAccess = async (req, res) => {
     console.log(req.cookies);
     const token = req.cookies.token;
 
-    const decodeToken = jwtDecode(token)
+    const decodeToken = await jwtDecode(token)
 
     // Log the token for debugging purposes
     console.log(token);
