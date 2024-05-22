@@ -4,7 +4,6 @@ const postSchema = require("../SchemaModel.js/postModel")
 const nodemailer = require("nodemailer")
 const configJs = require("../config/configemail")
 const jwt = require("jsonwebtoken");
-const jwtDecode = require ("jwt-decode")
 
 
 config();
@@ -154,24 +153,32 @@ const userLogin = async (req, res) => {
 
 // user access
 
-const userAccess = async (req, res) => {
+const jwtDecode = require('jwt-decode');
 
+const userAccess = async (req, res) => {
   try {
-    
-    console.log("erty67u890-")
+   
     console.log(req.cookies);
     const token = req.cookies.token;
 
-    const decodeToken = await jwtDecode(token)
+    if (!token) {
+      return res.status(401).json({
+        message: 'No token provided',
+        successful: false
+      });
+    }
+
+    const decodedToken =  jwtDecode(token);
 
     // Log the token for debugging purposes
     console.log(token);
-    console.log(decodeToken);
+    console.log(decodedToken);
+    console.log("-----------");
 
     // Send the token in the response
     res.status(200).json({
       data: token,
-      decode:decodeToken,
+      decode: decodedToken,
       successful: true
     });
 
@@ -183,6 +190,7 @@ const userAccess = async (req, res) => {
     });
   }
 }
+
 
 
 
