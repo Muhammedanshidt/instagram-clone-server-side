@@ -4,6 +4,8 @@ const postSchema = require("../SchemaModel.js/postModel")
 const nodemailer = require("nodemailer")
 const configJs = require("../config/configemail")
 const jwt = require("jsonwebtoken");
+const jwtDecode = require ("jwt-decode")
+
 
 config();
 console.log("hai in sign");
@@ -160,8 +162,11 @@ const userAccess = async (req, res) => {
     console.log(req.cookies);
     const token = req.cookies.token;
 
+    const decodeToken = jwtDecode(token)
+
     // Log the token for debugging purposes
     console.log(token);
+    console.log(decodeToken);
 
     // Send the token in the response
     res.status(200).json({
