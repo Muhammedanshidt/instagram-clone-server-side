@@ -3,8 +3,8 @@ const userModel = require("../SchemaModel.js/userModel");
 const postSchema = require("../SchemaModel.js/postModel")
 const nodemailer = require("nodemailer")
 const configJs = require("../config/configemail")
-const jwt = require("jsonwebtoken");
-
+const jwt = require('jsonwebtoken');
+const jwtDecode = require('jwt-decode');
 
 config();
 console.log("hai in sign");
@@ -153,11 +153,8 @@ const userLogin = async (req, res) => {
 
 // user access
 
-const jwtDecode = require('jwt-decode');
-
 const userAccess = async (req, res) => {
   try {
-   
     console.log(req.cookies);
     const token = req.cookies.token;
 
@@ -168,9 +165,8 @@ const userAccess = async (req, res) => {
       });
     }
 
-   
-   const secretKey =  process.env.JWT_SECRET
-   const decodedToken = jwt.verify(token, secretKey);
+    const secretKey = process.env.JWT_SECRET;
+    const decodedToken = jwt.verify(token, secretKey);
 
     // Log the token for debugging purposes
     console.log(token);
@@ -185,13 +181,13 @@ const userAccess = async (req, res) => {
     });
 
   } catch (error) {
-    // Handle any potential errors
+    console.error('Error verifying token:', error);
     res.status(500).json({
       message: 'Server encountered an issue',
       successful: false
     });
   }
-}
+};
 
 
 
