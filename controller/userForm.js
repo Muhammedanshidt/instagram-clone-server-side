@@ -172,7 +172,7 @@ const userAccess = async (req, res) => {
     console.log(token);
     console.log(decodedToken);
     console.log("-----------");
-    console.log(decodedToken.data._id);
+    console.log(decodedToken.data.id);
 
     const data = await userModel.findById(decodedToken.data.id)
 
