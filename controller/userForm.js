@@ -170,11 +170,13 @@ const userAccess = async (req, res) => {
 
     // Log the token for debugging purposes
     console.log(token);
-    console.log(decodedToken);
+    console.log("decode",decodedToken);
     console.log("-----------");
-    console.log(decodedToken._id);
+    console.log(decodedToken?.id);
 
-    const data = await userModel.findById(decodedToken._id)
+    const data = await userModel.findById(decodedToken?.id)
+
+    console.log(data);
 
     // Send the token in the response
     res.status(200).json({
