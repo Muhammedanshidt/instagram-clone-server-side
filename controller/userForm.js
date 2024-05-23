@@ -173,10 +173,12 @@ const userAccess = async (req, res) => {
     console.log(decodedToken);
     console.log("-----------");
 
+    const data = await userModel.findById(decodedToken.data._id)
+
     // Send the token in the response
     res.status(200).json({
-      data: token,
-      decode: decodedToken,
+      // data: token,
+      decode: data,
       successful: true
     });
 
