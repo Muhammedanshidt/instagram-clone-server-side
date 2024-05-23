@@ -174,7 +174,7 @@ const userAccess = async (req, res) => {
     console.log("-----------");
     console.log(decodedToken.data._id);
 
-    // const data = await userModel.findById(decodedToken.data._id)
+    const data = await userModel.findById(decodedToken.data.id)
 
     // Send the token in the response
     res.status(200).json({
