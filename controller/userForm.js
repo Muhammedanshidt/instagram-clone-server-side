@@ -48,8 +48,11 @@ const userSignUp = async (req, res) => {
     const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET);
 
 
-    res.cookie("otpToken", jwtOtp);
-
+    res.cookie("otpToken", jwtOtp,{
+      httpOnly: true,
+      maxAge: 60000
+    });
+ 
     // Send OTP via email
     const mailOptions = {
       from: process.env.EMAIL,
