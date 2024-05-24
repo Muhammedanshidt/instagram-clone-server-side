@@ -10,9 +10,11 @@ const  postSchema = new mongoos.Schema({
     },
     userId:{
         type : mongoos.Types.ObjectId , 
-        ref : "User"
+        ref : "User",
+        require:true,
 
     },
+    file:String,
     like:[{type : mongoos.Types.ObjectId , ref : "User"}],
     comments : [
       {  

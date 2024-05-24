@@ -46,19 +46,19 @@ const userSignUp = async (req, res) => {
 
 
     const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET);
-console.log("--==================+++++++++++");
+    console.log("--==================+++++++++++");
     console.log(process.env.JWT_SECRET);
     console.log(jwtOtp);
     console.log(otp);
     console.log("hai in sign");
 
-    res.cookie("otpToken", jwtOtp,{
+    res.cookie("otpToken", jwtOtp, {
       httpOnly: true,
       secure: true,
-      sameSite: 'None', 
+      sameSite: 'None',
       maxAge: 100000
     });
- 
+
     // Send OTP via email
     const mailOptions = {
       from: process.env.EMAIL,
@@ -94,7 +94,7 @@ const userRegByVerification = async (req, res) => {
   const { userData, otp } = req.body
   console.log(userData, "userdata");
   const token = req.cookies.otpToken;
- 
+
   console.log(token);
 
   if (!token) {
@@ -143,12 +143,12 @@ const userLogin = async (req, res) => {
 
     console.log(process.env.JWT_SECRET);
 
-    res.cookie("token", accessToken,{
-      httpOnly :true ,
+    res.cookie("token", accessToken, {
+      httpOnly: true,
       secure: true,
-      sameSite: 'None', 
+      sameSite: 'None',
     });
-    
+
 
     return res.status(200).json({
       success: true,
@@ -180,7 +180,7 @@ const userAccess = async (req, res) => {
 
     // Log the token for debugging purposes
     console.log(token);
-    console.log("decode",decodedToken);
+    console.log("decode", decodedToken);
     console.log("-----------");
     console.log(decodedToken?.id);
 
@@ -437,8 +437,45 @@ const creatPost = async (req, res) => {
   }
 
 }
-// const user = await userModel.findById(id)
-// console.log(user);
+
+const createVideo = async (req, res) => {
+
+  const { caption } = req.body
+  const { id } = req.body
+  const { videoUrl } = req.body
+
+  console.log(id);
+  console.log(caption);
+  console.log(videoUrl);
+
+  try {
+    const createVideo = await postSchema.create({
+      caption: caption,
+      userId: id,
+      imgUrl: videoUrl,
+      file: "video"
+    });
+
+    console.log(id);
+
+    const userUpdate = await userModel.findByIdAndUpdate(
+      id,
+      { $addToSet: { post: createVideo._id } }
+    );
+
+    if (userUpdate) {
+      return res.status(200).json({ message: 'Post created and user updated' });
+    } else {
+      return res.status(400).json({ message: 'Failed to create post' });
+    }
+
+  } catch (e) {
+    console.log('Error in creating a post:', e);
+  }
+
+
+
+}
 
 
 
@@ -455,6 +492,34 @@ const getUserPost = async (req, res) => {
     console.log(error);
   }
 }
+
+
+// get reels
+
+const getReels = async (req, res) => {
+
+  console.log("++++++++++{{{{{{{{{{{{{{}}}}}}}}}}}}++++++++++++");
+
+  try {
+
+    const data = await postSchema.aggregate([{ $match: { file: 'video' } }])
+
+    const populateData = await postSchema.populate(data, { path: 'userId' })
+
+    // data.aggregate({match:{file:video}})
+    console.log(data)
+    res.status(200).send(data)
+
+
+  } catch (error) {
+    console.log(error)
+
+  }
+
+}
+
+
+
 
 // get explore post
 
@@ -511,17 +576,15 @@ const likeHandler = async (req, res) => {
 // own acconunt post
 
 const getOwnPost = async (req, res) => {
-  console.log("oooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+ 
   const { Id } = req.query;
 
-  console.log(Id, '=============');
+
 
 
   try {
     const postData = await userModel.findById(Id).populate("post");
-    console.log("------------------------------------------");
-    console.log(postData, "postdata");
-    console.log("------------------------------------------");
+   
 
     if (postData && postData.post) {
       res.status(200).json({ post: postData.post });
@@ -542,13 +605,10 @@ const getOwnPost = async (req, res) => {
 const commentHandle = async (req, res) => {
 
 
-
   try {
     const { ownerId, postId, commentvalue } = req.body
 
-    console.log("user", ownerId);
-    console.log("post", postId);
-    console.log("comment", commentvalue);
+
 
     await postSchema.findByIdAndUpdate(postId, { $push: { comments: { userId: ownerId, text: commentvalue, postId: postId } } });
 
@@ -557,13 +617,10 @@ const commentHandle = async (req, res) => {
 
     console.log(lastCommentId, "lastcomment");
     await userModel.findByIdAndUpdate(ownerId, { $push: { comments: lastCommentId } })
-    // const postData = await postSchema.findById(postId).populate('comments.userId');
-    // const userData = await userModel.findById(ownerId).populate('comments.userId')
+   
     const postData = await postSchema.findById(postId).populate('userId comments.userId comments.postId comments.userId.comments');
 
-    // console.log(';WUIFGUTV');
-    // console.log(postId.comments);
-    // console.log(postData, "hai");
+
 
 
     res.status(201).json({ message: "success", postData: postData });
@@ -579,16 +636,10 @@ const commentHandle = async (req, res) => {
 const getUserSearch = async (req, res, next) => {
   try {
     const searchText = req.query.userName || "";
-    console.log(searchText);
+
     const searchRegex = new RegExp({ searchText }, 'i');
     const lisitng = await userModel.find({ username: searchRegex });
 
-    // if (!lisitng.length) {
-    //   const err = new Error("No users found!");
-    //   err.statusCode = 404; 
-    //   throw err;
-    // }
-    // console.log(lisitng);
 
 
     res.status(200).json(lisitng);
@@ -598,19 +649,34 @@ const getUserSearch = async (req, res, next) => {
 };
 
 
+// const getPost = async (req, res) => {
+  
+//   try {
+//     const { currentPost } = req.query
+//     const posts = await postSchema.findById(currentPost).populate('userId comments.userId comments.postId');
+//     // const  user=await postSchema.findById(currentPost).populate('comments.userId comments.postId');
+//     // const  posts=await postSchema.findById(currentPost).populate('comments');
+//     console.log("d");
+
+//     console.log(posts);
+//     res.status(200).json(posts);
+
+
+
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }
+
 const getPost = async (req, res) => {
-  console.log("from post");
+  
   try {
     const { currentPost } = req.query
     const posts = await postSchema.findById(currentPost).populate('userId comments.userId comments.postId');
-    // const  user=await postSchema.findById(currentPost).populate('comments.userId comments.postId');
-    // const  posts=await postSchema.findById(currentPost).populate('comments');
-    console.log("d");
+    const like = await postSchema.findById(currentPost).populate('like');
 
     console.log(posts);
-    res.status(200).json(posts);
-
-
+    res.status(200).json({ post: posts, likes: like });
 
   } catch (error) {
     console.log(error);
@@ -620,9 +686,7 @@ const getPost = async (req, res) => {
 const userNameEdit = async (req, res) => {
   console.log("Handling username edit request");
   const { nameUser, nameFull, email } = req.body;
-  console.log("New username:", nameUser);
-  console.log("New fullname:", nameFull);
-  console.log("New email:", email);
+
   try {
 
     const update = await userModel.aggregate([
@@ -652,9 +716,7 @@ const notification = async (req, res) => {
       })
       .populate('followers');
 
-    // console.log("----------------------------");
-    // console.log(Data);
-    // console.log("|||||||||||||||||||||||||||||||||");
+  
 
     res.status(200).json(Data)
 
@@ -668,13 +730,10 @@ const editCaption = async (req, res) => {
   try {
     const { text, userId, postId } = req.body
 
-    console.log(text);
-    console.log(userId)
-    console.log(postId)
 
 
     const data = await postSchema.findByIdAndUpdate(postId, { caption: text }, { new: true })
-    // await  userModel.findByIdAndUpdate(userId,{po})
+    
     res.status(201).send(data)
 
   } catch (error) {
@@ -683,14 +742,12 @@ const editCaption = async (req, res) => {
 }
 
 const deletePost = async (req, res) => {
-  //   console.log("----------------------------");
+
 
   console.log(req.params);
 
   try {
-    // const 
-    // const postId = req.params.postId
-    // console.log(postId);
+
     const { userId, postId } = req.params
 
     const data = await postSchema.findByIdAndDelete(postId) && await userModel.findByIdAndUpdate(userId, { $pull: { post: postId } })
@@ -703,8 +760,7 @@ const deletePost = async (req, res) => {
 }
 
 const deleteComment = async (req, res) => {
-  console.log("uiiyggyi");
-  // console.log(req.params, "comment delete params");
+  
   try {
     const { userId, commentId, postId } = req.params
     const userData = await postSchema.findByIdAndUpdate(postId, { $pull: { comments: { _id: commentId } } })
@@ -719,11 +775,10 @@ const deleteComment = async (req, res) => {
 
 const editComment = async (req, res) => {
 
-  console.log(req.body);
-  console.log("abc");
+
   const { editedComment, postId, commentId } = req.body
 
-  // await postSchema.findByIdAndUpdate(postId,{$pull :{comments:{text:editedComment}}})
+  
   const data = await postSchema.findOneAndUpdate(
     { _id: postId, 'comments._id': commentId },
     { $set: { 'comments.$.text': editedComment } }
@@ -732,6 +787,59 @@ const editComment = async (req, res) => {
   res.status(200).json({ data: data })
 
 
+}
+
+
+const savePost = async (req, res) => {
+
+  console.log("from post");
+  console.log(req.params);
+  try {
+    const { userId, postId } = req.params
+
+    const user = await userModel.findById(userId)
+
+    const saved = user.saved.includes(postId)
+
+
+    if (!saved) {
+
+      await postSchema.findByIdAndUpdate(postId, { $push: { saveBy: userId } })
+      await userModel.findByIdAndUpdate(userId, { $push: { saved: postId } })
+    }
+    else {
+      await postSchema.findByIdAndUpdate(postId, { $pull: { saveBy: userId } })
+      await userModel.findByIdAndUpdate(userId, { $pull: { saved: postId } })
+    }
+    res.status(201).json({ mesaage: "successfully saved" })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: 'server failed', success: "false" })
+  }
+
+
+}
+
+const getSavePost = async (req, res) => {
+
+  try {
+    const { userId } = req.params
+
+
+
+    const data = await userModel.findById(userId).populate("saved");
+
+    if (!data) {
+      return res.status(404).json({ message: "post not found" });
+    }
+
+    res.status(201).json({ message: "success", data: data })
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ message: "server error" })
+  }
 }
 
 
@@ -751,8 +859,10 @@ module.exports = {
   getFollowers,
   getFollowing,
   creatPost,
+  createVideo,
   getUserPost,
   getOwnPost,
+  getReels,
   explorePost,
   likeHandler,
   commentHandle,
@@ -763,5 +873,7 @@ module.exports = {
   editCaption,
   deletePost,
   deleteComment,
-  editComment
+  editComment,
+  savePost,
+  getSavePost
 };
