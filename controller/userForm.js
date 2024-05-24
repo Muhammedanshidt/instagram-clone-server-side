@@ -15,13 +15,12 @@ config();
 // USER SIGNUP
 const userSignUp = async (req, res) => {
   
-
   try {
     const { email } = req.body;
-
     
+    console.log("signUpEmail", email )
 
-    // Check if email already exists
+
     const existingUser = await userModel.findOne({ email });
 
     if (existingUser) {
@@ -29,8 +28,7 @@ const userSignUp = async (req, res) => {
     }
  
 
-
-    // Create transporter
+    // Create transporter mail
     const transporter = nodemailer.createTransport(
       {
         service: "gmail",
