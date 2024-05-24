@@ -46,11 +46,17 @@ const userSignUp = async (req, res) => {
 
 
     const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET);
-
+console.log("--==================+++++++++++");
+    console.log(process.env.JWT_SECRET);
+    console.log(jwtOtp);
+    console.log(otp);
+    console.log("hai in sign");
 
     res.cookie("otpToken", jwtOtp,{
       httpOnly: true,
-      maxAge: 60000
+      secure: true,
+      sameSite: 'None', 
+      maxAge: 100000
     });
  
     // Send OTP via email
