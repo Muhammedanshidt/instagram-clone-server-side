@@ -85,7 +85,8 @@ const userRegByVerification = async (req, res) => {
   const { userData, otp } = req.body
   console.log(userData, "userdata");
   const token = req.cookies.otpToken;
-
+ 
+  console.log(token);
 
   if (!token) {
     return res.status(404).json({ message: 'OTP token not found' });
