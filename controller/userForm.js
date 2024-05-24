@@ -7,26 +7,27 @@ const jwt = require('jsonwebtoken');
 // const jwtDecode = require('jwt-decode');
 
 config();
-console.log("hai in sign");
+
+
 
 
 
 // USER SIGNUP
 const userSignUp = async (req, res) => {
-  console.log("object")
+  
 
   try {
     const { email } = req.body;
 
-    console.log(req.body);
+    
 
     // Check if email already exists
     const existingUser = await userModel.findOne({ email });
-    console.log(existingUser);
+
     if (existingUser) {
       return res.status(400).send("User already exists");
     }
-    console.log(email);
+ 
 
 
     // Create transporter
@@ -46,16 +47,10 @@ const userSignUp = async (req, res) => {
 
 
     const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET);
-    console.log("--==================+++++++++++");
-    console.log(process.env.JWT_SECRET);
-    console.log(jwtOtp);
-    console.log(otp);
-    console.log("hai in sign");
+ 
 
     res.cookie("otpToken", jwtOtp, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'None',
       maxAge: 100000
     });
 
@@ -68,7 +63,7 @@ const userSignUp = async (req, res) => {
     };
     transporter.sendMail(mailOptions, (error) => {
       if (error) {
-        console.error(error);
+
         return res.status(500).send("Failed to send verification code");
       } else {
         return res.status(200).json({ message: "Verification Code Sent" });
@@ -89,13 +84,13 @@ const userSignUp = async (req, res) => {
 
 const userRegByVerification = async (req, res) => {
 
-  console.log("jggh");
+
 
   const { userData, otp } = req.body
-  console.log(userData, "userdata");
+
   const token = req.cookies.otpToken;
 
-  console.log(token);
+
 
   if (!token) {
     return res.status(404).json({ message: 'OTP token not found' });
@@ -141,7 +136,7 @@ const userLogin = async (req, res) => {
       { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
     );
 
-    console.log(process.env.JWT_SECRET);
+    
 
     res.cookie("token", accessToken, {
       httpOnly: true,
@@ -165,7 +160,7 @@ const userLogin = async (req, res) => {
 
 const userAccess = async (req, res) => {
   try {
-    console.log(req.cookies);
+    
     const token = req.cookies.token;
 
     if (!token) {
@@ -178,15 +173,11 @@ const userAccess = async (req, res) => {
     const secretKey = process.env.JWT_SECRET;
     const decodedToken = jwt.verify(token, secretKey);
 
-    // Log the token for debugging purposes
-    console.log(token);
-    console.log("decode", decodedToken);
-    console.log("-----------");
-    console.log(decodedToken?.id);
+    
 
     const data = await userModel.findById(decodedToken?.id)
 
-    console.log(data);
+
 
     // Send the token in the response
     res.status(200).json({
@@ -216,8 +207,6 @@ const bioRes = async (req, res) => {
   try {
     let data = req.body.bio;
     let userId = req.body.userData._id
-    console.log(userId);
-    console.log(data);
 
     const updateBio = await userModel.findByIdAndUpdate(
       userId,
@@ -244,11 +233,10 @@ const logBack = (req, res) => {
 
 // profile pic setting
 const userProfileImage = async (req, res) => {
-  console.log("profile");
   try {
     let url = req.body.imageUrl
     let email = req.body.email
-    console.log(url);
+
     const updateProfile = await userModel.findOneAndUpdate(
       { email: email },
       { $set: { profileimage: url } },
@@ -259,7 +247,7 @@ const userProfileImage = async (req, res) => {
     )
 
   } catch (error) {
-    console.log(error);
+
     res.status(500).json({ message: "server error" })
 
   }
@@ -275,21 +263,20 @@ const getUser = async (req, res) => {
 
   res.status(200).send(data)
 
-  console.log(data, "uyyuyuuhy");
+
 
 }
 
 const userFindByName = async (req, res) => {
 
   const { username } = req.body
-  console.log(username, "uuuucurrent level");
+
 
   if (!username) {
     return res.status(400).json({ message: "No Username provided!" })
   } else {
     const founduser = await userModel.findOne({ username: username })
-    // console.log(founduser);
-    // console.log("------------------------");
+
     res.status(200)
       .send(founduser)
   }
@@ -299,7 +286,7 @@ const userFindByName = async (req, res) => {
 
 const userFindById = async (req, res) => {
   const id = req.params.id; // Correctly extract id from req.params
-  // console.log(id, "11111111111111111111111111111111111111111111111111111111111");
+
   try {
     const user = await userModel.findById(id);
     res.status(200).json(user);
@@ -313,7 +300,7 @@ const userFindById = async (req, res) => {
 const userFollow = async (req, res) => {
   const { user } = req.body
   const { owner } = req.body
-  // console.log(owner);
+
   try {
     const following = await userModel.findById(user);
     if (!following) {
@@ -337,13 +324,11 @@ const userFollow = async (req, res) => {
 
 const userUnfollow = async (req, res) => {
 
-  console.log(req.body);
+
 
   const { userId } = req.body
   const { currentUserId } = req.body
 
-  // console.log(userId);
-  // console.log(currentUserId);
   try {
 
     await userModel.findByIdAndUpdate(currentUserId, { $pull: { following: userId } });
@@ -363,10 +348,10 @@ const getFollowers = async (req, res) => {
   if (req.query.owner && req.query.owner.followers) {
     try {
       const followers = req.query.owner.followers;
-      console.log(followers);
+
 
       const findFollowers = await userModel.find({ _id: { $in: followers } });
-      console.log(findFollowers);
+
       return res.status(200).json(findFollowers)
 
     } catch (error) {
@@ -376,7 +361,7 @@ const getFollowers = async (req, res) => {
 
   } else {
 
-    console.log("no followers");
+
   }
 }
 
@@ -390,7 +375,7 @@ const getFollowing = async (req, res) => {
     try {
       const following = req.query.owner.following;
       const findFollowing = await userModel.find({ _id: { $in: following } });
-      // console.log(findFollowing);
+
       return res.status(200).json(findFollowing)
 
     }
@@ -408,9 +393,6 @@ const creatPost = async (req, res) => {
   const { id } = req.body
   const { imageUrl } = req.body
 
-  console.log(id);
-  console.log(caption);
-  console.log(imageUrl);
 
   try {
     const createPost = await postSchema.create({
@@ -419,7 +401,7 @@ const creatPost = async (req, res) => {
       imgUrl: imageUrl
     });
 
-    console.log(id);
+    
 
     const userUpdate = await userModel.findByIdAndUpdate(
       id,
@@ -444,10 +426,6 @@ const createVideo = async (req, res) => {
   const { id } = req.body
   const { videoUrl } = req.body
 
-  console.log(id);
-  console.log(caption);
-  console.log(videoUrl);
-
   try {
     const createVideo = await postSchema.create({
       caption: caption,
@@ -456,7 +434,7 @@ const createVideo = async (req, res) => {
       file: "video"
     });
 
-    console.log(id);
+
 
     const userUpdate = await userModel.findByIdAndUpdate(
       id,
@@ -481,11 +459,11 @@ const createVideo = async (req, res) => {
 
 const getUserPost = async (req, res) => {
   const { ownerId } = req.query
-  console.log(ownerId);
+
 
   try {
     const posts = await postSchema.find({ userId: ownerId })
-    // console.log(posts,'hjgfdghd');
+
     res.status(201).json(posts)
 
   } catch (error) {
@@ -498,7 +476,6 @@ const getUserPost = async (req, res) => {
 
 const getReels = async (req, res) => {
 
-  console.log("++++++++++{{{{{{{{{{{{{{}}}}}}}}}}}}++++++++++++");
 
   try {
 
@@ -506,8 +483,7 @@ const getReels = async (req, res) => {
 
     const populateData = await postSchema.populate(data, { path: 'userId' })
 
-    // data.aggregate({match:{file:video}})
-    console.log(data)
+      
     res.status(200).send(data)
 
 
@@ -533,7 +509,7 @@ const explorePost = async (req, res) => {
 
   } catch (error) {
     console.log(error);
-    res.status(400).send(error)
+      res.status(400).send(error)
   }
 };
 
@@ -615,7 +591,7 @@ const commentHandle = async (req, res) => {
     const updatePost = await postSchema.findById(postId)
     const lastCommentId = updatePost.comments[updatePost.comments.length - 1]._id;
 
-    console.log(lastCommentId, "lastcomment");
+
     await userModel.findByIdAndUpdate(ownerId, { $push: { comments: lastCommentId } })
    
     const postData = await postSchema.findById(postId).populate('userId comments.userId comments.postId comments.userId.comments');
@@ -675,7 +651,6 @@ const getPost = async (req, res) => {
     const posts = await postSchema.findById(currentPost).populate('userId comments.userId comments.postId');
     const like = await postSchema.findById(currentPost).populate('like');
 
-    console.log(posts);
     res.status(200).json({ post: posts, likes: like });
 
   } catch (error) {
@@ -684,8 +659,7 @@ const getPost = async (req, res) => {
 }
 
 const userNameEdit = async (req, res) => {
-  console.log("Handling username edit request");
-  const { nameUser, nameFull, email } = req.body;
+    const { nameUser, nameFull, email } = req.body;
 
   try {
 
@@ -695,7 +669,6 @@ const userNameEdit = async (req, res) => {
 
     const ckeck = await userModel.findOne({ email: email })
 
-    console.log(ckeck)
     res.status(200).json({ update, message: "Update success" });
   } catch (err) {
     console.log(err);
@@ -744,7 +717,7 @@ const editCaption = async (req, res) => {
 const deletePost = async (req, res) => {
 
 
-  console.log(req.params);
+
 
   try {
 
@@ -792,8 +765,7 @@ const editComment = async (req, res) => {
 
 const savePost = async (req, res) => {
 
-  console.log("from post");
-  console.log(req.params);
+
   try {
     const { userId, postId } = req.params
 
