@@ -8,18 +8,12 @@ const jwt = require('jsonwebtoken');
 
 config();
 
-
-
-
-
 // USER SIGNUP
 const userSignUp = async (req, res) => {
   
   try {
     const { email } = req.body;
     
-    console.log("signUpEmail", email )
-
 
     const existingUser = await userModel.findOne({ email });
 
@@ -29,6 +23,7 @@ const userSignUp = async (req, res) => {
  
 
     // Create transporter mail
+
     const transporter = nodemailer.createTransport(
       {
         service: "gmail",
@@ -71,7 +66,7 @@ const userSignUp = async (req, res) => {
     });
 
   } catch (error) {
-    console.log("Error creating user:", error);
+
     return res.status(500).json({
       alert: error.message,
       message: "Internal server error. Please try again later",
@@ -104,8 +99,12 @@ const userRegByVerification = async (req, res) => {
 
 
   if (decodedToken.otp === parseInt(otp)) {
+    try{
     const userCreate = await userModel.create(userData);
     return res.status(200).json({ message: 'OTP verified', success: true });
+    } catch (error) {
+      return res.status(500).json({ message: 'Internal server error. Please try again later' });
+    }
   } else {
     return res.status(400).json({ message: 'OTP does not match' });
   }
