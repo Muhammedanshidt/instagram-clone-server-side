@@ -49,6 +49,8 @@ const userSignUp = async (req, res) => {
 
     res.cookie("otpToken", jwtOtp, {
       httpOnly: true,
+      secure: true,
+      sameSite: 'None',
       maxAge: 100000
     });
 
