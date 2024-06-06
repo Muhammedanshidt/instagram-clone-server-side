@@ -1,17 +1,17 @@
 
-// const express = require("express");
-// const router = express();
-// const controller = require('../controller/messageForm');
+const express = require("express");
+const router = express();
+const controller = require('../controller/messageForm');
 
 
-// // conversation
+// conversation
 
-// router.route("/createroom").post(controller.createRoom)
-// router.route("/getroom/:userId").get(controller.getRoom)
+router.route("/createroom").post(controller.createRoom)
+router.route("/getroom/:userId").get(controller.getRoom)
 
-// // messages
+// messages
 
-// router.route("/createmessage").post(controller.createmessage)
-// router.route("/getmessage/:conversationId").get(controller.getMessage)
+router.route("/createmessage").post(controller.createmessage)
+router.route("/getmessage/:conversationId").get(controller.getMessage)
 
-// module.exports = router
+module.exports = router

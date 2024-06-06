@@ -46,7 +46,6 @@ const userSignUp = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: 'None',
-      maxAge: 100000
     });
 
     // Send OTP via email
