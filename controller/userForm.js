@@ -41,7 +41,6 @@ const userSignUp = async (req, res) => {
 
     const jwtOtp = jwt.sign({ otp }, process.env.JWT_SECRET);
  
-console.log(jwtOtp);
     res.cookie("otpToken", jwtOtp, {
       httpOnly: true,
       secure: true,
