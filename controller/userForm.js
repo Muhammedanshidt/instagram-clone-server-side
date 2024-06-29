@@ -111,9 +111,13 @@ const userRegByVerification = async (req, res) => {
 
 
 const userLogin = async (req, res) => {
+  
   const { email, password } = req.body;
   try {
-    const findUser = await userModel.findOne({ email: email });
+      const findUser = await userModel.findOne(
+      {email: email},
+      {email:1,_id:1,password:1}
+    );
 
     if (!findUser) {
       return res.status(401).json({
@@ -133,8 +137,7 @@ const userLogin = async (req, res) => {
       { email: findUser.email, id: findUser._id }, process.env.JWT_SECRET
     );
 
-    
-
+  
     res.cookie("token", accessToken, {
       httpOnly: true,
       secure: true,
@@ -156,6 +159,7 @@ const userLogin = async (req, res) => {
 // user access
 
 const userAccess = async (req, res) => {
+  console.log("Lkm");
   try {
     
     const token = req.cookies.token;
